@@ -10,10 +10,10 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  final controller = Get.find<WelcomeController>();
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final controller = Get.find<WelcomeController>();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -105,37 +105,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                     ),
-                    if (!controller.isLastPage.value) ...[
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 55,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: colorScheme.onSurface.withOpacity(0.2),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            controller.pageController.animateToPage(
-                              controller.pages.length - 1,
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.fastOutSlowIn,
-                            );
-                          },
-                          child: Text(
-                            'Skip',
-                            style: TextStyle(
-                              color: colorScheme.onSurface,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -174,6 +143,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       height: 260,
       width: double.infinity,
       child: Stack(
+        clipBehavior: .none,
         alignment: Alignment.center,
         children: [
           Container(
@@ -193,6 +163,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               color: Color(0xFF00334E),
             ),
           ),
+
+            Positioned(
+              top: -55,
+              right: 0,
+              child: TextButton(
+                onPressed: () {
+
+                },
+                child: Text(
+                  'Skip',
+                  style: TextStyle(color: colorScheme.onSurface, fontSize: 18),
+                ),
+              ),
+            ),
+
           Positioned(top: 20, left: 50, child: _smallDot(colorScheme, 20)),
           Positioned(top: 0, right: 40, child: _smallDot(colorScheme, 30)),
           Positioned(bottom: 50, left: 30, child: _smallDot(colorScheme, 25)),
