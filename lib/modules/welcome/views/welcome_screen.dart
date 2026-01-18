@@ -164,19 +164,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
 
-            Positioned(
-              top: -55,
-              right: 0,
-              child: TextButton(
-                onPressed: () {
-
-                },
-                child: Text(
-                  'Skip',
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 18),
-                ),
+          Positioned(
+            top: -55,
+            right: 0,
+            child: TextButton(
+              onPressed: () {},
+              child: Text(
+                'Skip',
+                style: TextStyle(color: colorScheme.onSurface, fontSize: 15),
               ),
             ),
+          ),
 
           Positioned(top: 20, left: 50, child: _smallDot(colorScheme, 20)),
           Positioned(top: 0, right: 40, child: _smallDot(colorScheme, 30)),
