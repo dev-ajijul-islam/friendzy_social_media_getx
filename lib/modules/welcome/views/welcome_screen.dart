@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/welcome/controllers/welcome_controller.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -88,7 +89,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         onPressed: () {
                           if (controller.isLastPage.value) {
-                            // Navigate to next screen logic here
+                           Get.offAndToNamed(AppRoutes.signInScreen);
                           } else {
                             controller.pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
@@ -105,29 +106,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Already have an account? ",
-                          style: TextStyle(
-                            color: colorScheme.onSurface.withOpacity(0.7),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Text(
-                            "Sign In",
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -164,22 +142,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
 
+          Positioned(top: 20, left: 50, child: _smallDot(colorScheme, 20)),
+          Positioned(top: 0, right: 40, child: _smallDot(colorScheme, 30)),
+          Positioned(bottom: 50, left: 30, child: _smallDot(colorScheme, 25)),
+          Positioned(bottom: 20, right: 60, child: _smallDot(colorScheme, 35)),
           Positioned(
             top: -55,
             right: 0,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.offAndToNamed(AppRoutes.signInScreen);
+              },
               child: Text(
                 'Skip',
                 style: TextStyle(color: colorScheme.onSurface, fontSize: 15),
               ),
             ),
           ),
-
-          Positioned(top: 20, left: 50, child: _smallDot(colorScheme, 20)),
-          Positioned(top: 0, right: 40, child: _smallDot(colorScheme, 30)),
-          Positioned(bottom: 50, left: 30, child: _smallDot(colorScheme, 25)),
-          Positioned(bottom: 20, right: 60, child: _smallDot(colorScheme, 35)),
         ],
       ),
     );

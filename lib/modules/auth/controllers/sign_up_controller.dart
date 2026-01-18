@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
-class SignInController extends GetxController {
-
+class SignUpController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
 
   final forgotEmailController = TextEditingController();
   final phoneController = TextEditingController();
   final lastPasswordController = TextEditingController();
-
 
   var isPasswordVisible = false.obs;
   final loginFormKey = GlobalKey<FormState>();
@@ -21,11 +17,10 @@ class SignInController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  void login() {
-    // if (loginFormKey.currentState!.validate()) {
-    //   debugPrint("Logging in with: ${emailController.text}");
-    // }
-    Get.offAndToNamed(AppRoutes.mainLayout);
+  void signUp() {
+    if (loginFormKey.currentState!.validate()) {
+      debugPrint("Logging in with: ${emailController.text}");
+    }
   }
 
   void resetPassword() {
