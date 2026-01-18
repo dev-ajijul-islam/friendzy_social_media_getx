@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:friendzy_social_media_getx/modules/home/views/home_screen.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/views/upload_post_screen.dart';
 import 'package:get/get.dart';
 
 class MainLayoutController extends GetxController {
@@ -7,7 +8,7 @@ class MainLayoutController extends GetxController {
   final List<Widget> screens = [
     const HomeScreen(),
     const Center(child: Text("Explore")),
-    const Center(child: Text("Add Post")),
+    const UploadPostScreen(),
     const Center(child: Text("Messages")),
     const Center(child: Text("Profile")),
   ];
