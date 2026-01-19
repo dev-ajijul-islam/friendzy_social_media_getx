@@ -42,7 +42,7 @@ class CounterApp extends StatelessWidget {
       ),
 
 
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
     );
   }
 }
