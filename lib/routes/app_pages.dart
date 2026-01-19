@@ -11,6 +11,7 @@ import 'package:friendzy_social_media_getx/modules/my_profile/views/edit_profile
 import 'package:friendzy_social_media_getx/modules/user_profile/views/user_profile_screen.dart';
 import 'package:friendzy_social_media_getx/modules/notifications/views/notification_screen.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/post_details_screen.dart';
+import 'package:friendzy_social_media_getx/modules/story_details/views/story_details_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -45,5 +46,6 @@ class AppPages {
     GetPage(name: AppRoutes.userProfile,page: () => UserProfileScreen(),),
     GetPage(name: AppRoutes.notificationScreen,page: () => NotificationScreen(),),
     GetPage(name: AppRoutes.postDetailsScreen,page: () => PostDetailsScreen(),),
+    GetPage(name: AppRoutes.storyDetailsScreen,page: () => StoryDetailsScreen(),),
   ];
 }

@@ -91,77 +91,83 @@ class HomeScreen extends StatelessWidget {
         itemCount: stories.length,
         itemBuilder: (context, index) {
           final story = stories[index];
-          return Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Column(
-              children: [
-                Stack(
-                  clipBehavior: .none,
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    Container(
-                      width: 95,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        border: .all(color: Colors.black),
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.grey[200],
-                        image: story['image'] != ''
-                            ? DecorationImage(
-                                image: NetworkImage(story['image']!),
-                                fit: BoxFit.cover,
+          return GestureDetector(
+            onTap: () => Get.toNamed(AppRoutes.storyDetailsScreen),
+           child:  Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Column(
+                children: [
+                  Stack(
+                    clipBehavior: .none,
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      Container(
+                        width: 95,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          border: .all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.grey[200],
+                          image: story['image'] != ''
+                              ? DecorationImage(
+                                  image: NetworkImage(story['image']!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: story['isMe'] == 'true'
+                            ? const Center(
+                                child: Icon(Icons.add, color: Colors.black),
                               )
                             : null,
                       ),
-                      child: story['isMe'] == 'true'
-                          ? const Center(
-                              child: Icon(Icons.add, color: Colors.black),
-                            )
-                          : null,
-                    ),
-                    if (story['isLive'] == 'true')
+                      if (story['isLive'] == 'true')
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black38,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Text(
+                              'LIVE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                            ),
+                          ),
+                        ),
                       Positioned(
-                        top: 5,
-                        right: 5,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black38,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Text(
-                            'LIVE',
-                            style: TextStyle(color: Colors.white, fontSize: 8),
+                        bottom: -15,
+                        child: const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 17,
+                            backgroundImage: NetworkImage(
+                              'https://i.pravatar.cc/150?u=9',
+                            ),
                           ),
                         ),
                       ),
-                    Positioned(
-                      bottom: -15,
-                      child: const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
-                          radius: 17,
-                          backgroundImage: NetworkImage(
-                            'https://i.pravatar.cc/150?u=9',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  story['name']!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 14),
+                  Text(
+                    story['name']!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

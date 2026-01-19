@@ -9,4 +9,5 @@ class AppRoutes {
   static String userProfile = "/user-profile-screen";
   static String notificationScreen = "/notification-screen";
   static String postDetailsScreen = "/post-details-screen";
+  static String storyDetailsScreen = "/story-details-screen";
 }
