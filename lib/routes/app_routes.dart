@@ -6,4 +6,6 @@ class AppRoutes {
   static String signUpScreen = "/sign-up-screen";
   static String mainLayout = "/main-layout";
   static String editProfile = "/edit-profile-screen";
+  static String userProfile = "/user-profile-screen";
+  static String notificationScreen = "/notification-screen";
 }

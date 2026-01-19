@@ -8,6 +8,8 @@ import 'package:friendzy_social_media_getx/modules/main_layout/views/main_layout
 import 'package:friendzy_social_media_getx/modules/splash/views/splash_screen.dart';
 import 'package:friendzy_social_media_getx/modules/welcome/views/welcome_screen.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/views/edit_profile_screen.dart';
+import 'package:friendzy_social_media_getx/modules/user_profile/views/user_profile_screen.dart';
+import 'package:friendzy_social_media_getx/modules/notifications/views/notification_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -38,6 +40,8 @@ class AppPages {
       binding: MainLayoutBinding()
     ),
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
-    GetPage(name: AppRoutes.editProfile,page: () => EditProfileScreen(),)
+    GetPage(name: AppRoutes.editProfile,page: () => EditProfileScreen(),),
+    GetPage(name: AppRoutes.userProfile,page: () => UserProfileScreen(),),
+    GetPage(name: AppRoutes.notificationScreen,page: () => NotificationScreen(),),
   ];
 }

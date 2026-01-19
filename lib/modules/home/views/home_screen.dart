@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -55,7 +57,9 @@ class HomeScreen extends StatelessWidget {
           ),
 
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.toNamed(AppRoutes.notificationScreen);
+            },
             icon: const Icon(
               Icons.notifications_none_outlined,
               size: 28,
