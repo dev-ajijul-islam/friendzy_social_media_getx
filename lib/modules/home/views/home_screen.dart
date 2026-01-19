@@ -19,8 +19,6 @@ class HomeScreen extends StatelessWidget {
 
             _buildStoriesSection(),
 
-            const SizedBox(height: 0),
-
             _buildFeedSection(colorScheme),
           ],
         ),
@@ -57,9 +55,7 @@ class HomeScreen extends StatelessWidget {
           ),
 
           IconButton(
-            onPressed: () {
-
-            },
+            onPressed: () {},
             icon: const Icon(
               Icons.notifications_none_outlined,
               size: 28,
@@ -182,10 +178,10 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildPostCard(ColorScheme colorScheme) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.grey[50]!.withOpacity(0.5),
+        color: Colors.grey[100]!.withAlpha(500),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(

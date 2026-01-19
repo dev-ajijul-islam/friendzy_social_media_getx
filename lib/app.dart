@@ -3,8 +3,8 @@ import 'package:friendzy_social_media_getx/routes/app_pages.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
-class CounterApp extends StatelessWidget {
-  const CounterApp({super.key});
+class FriendzySocial extends StatelessWidget {
+  const FriendzySocial({super.key});
 
   @override
   Widget build(BuildContext context) {

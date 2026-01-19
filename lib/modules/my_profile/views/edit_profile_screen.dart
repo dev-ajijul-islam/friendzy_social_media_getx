@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +7,7 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    const Color primaryTeal = Color(0xFF006680);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -15,39 +15,46 @@ class EditProfileScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Get.back(),
         ),
         title: const Text(
           'My Profile',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Center(
               child: Stack(
                 children: [
                   const CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                      'https://i.pravatar.cc/150?u=5',
-                    ),
+                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=5'),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: CircleAvatar(
-                      radius: 15,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.camera_alt,
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt_outlined,
                         size: 18,
-                        color: colorScheme.primary,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -55,67 +62,109 @@ class EditProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            _buildEditField("Username", "Enter username"),
-            _buildEditField("Region", "Enter region"),
+
+            // Form Fields
+            _buildLabel("Username"),
+            _buildInputField(hint: "Enter your username"),
+
+            _buildLabel("Region"),
+            _buildInputField(hint: "Abeokuta, Ogun"),
+
+
             Row(
               children: [
-                Expanded(child: _buildEditField("Phone Number", "Enter phone")),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel("Phone Number"),
+                      _buildInputField(hint: "09012345678"),
+                    ],
+                  ),
+                ),
                 const SizedBox(width: 15),
-                Expanded(child: _buildEditField("Gender", "Enter gender")),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel("Gender"),
+                      _buildInputField(hint: "Female"),
+                    ],
+                  ),
+                ),
               ],
             ),
-            _buildEditField("About", "Write something...", maxLines: 4),
-            const SizedBox(height: 30),
+
+            _buildLabel("About"),
+            _buildInputField(
+              hint: "I'm a positive person. I love to travel and eat. Always available for chat",
+              maxLines: 4,
+            ),
+
+            const SizedBox(height: 40),
+
+            // Update Button
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
+                  backgroundColor: primaryTeal,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 0,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // Update Profile Logic
+                },
                 child: const Text(
                   'Update',
                   style: TextStyle(
-                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEditField(String label, String hint, {int maxLines = 1}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+  // Helper widget for Labels
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0, top: 16),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
         ),
-        const SizedBox(height: 8),
-        TextField(
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: const Color(0xFFF2F2F2),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-          ),
+      ),
+    );
+  }
+
+  // Helper widget for Input Fields
+  Widget _buildInputField({required String hint, int maxLines = 1}) {
+    return TextField(
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black54, fontSize: 14),
+        filled: true,
+        fillColor: const Color(0xFFF2F2F2),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        const SizedBox(height: 20),
-      ],
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
     );
   }
 }

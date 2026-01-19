@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
 class MyProfileScreen extends StatelessWidget {
   const MyProfileScreen({super.key});
@@ -97,7 +98,7 @@ class MyProfileScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Navigate to Edit Screen
+                        Get.toNamed(AppRoutes.editProfile);
                       },
                       child: const Text(
                         'Edit Profile',
