@@ -181,111 +181,119 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildPostCard(ColorScheme colorScheme) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.grey[100]!.withAlpha(500),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=5'),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Oyin Dolapo',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.postDetailsScreen),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        decoration: BoxDecoration(
+          color: Colors.grey[100]!.withAlpha(500),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(
+                    'https://i.pravatar.cc/150?u=5',
                   ),
-                  Text(
-                    '1hr ago',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra',
-            style: TextStyle(fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            clipBehavior: .hardEdge,
-            decoration: BoxDecoration(
-              border: .all(color: Colors.black),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Image.network(
-              'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 200,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const SizedBox(
-                width: 60,
-                child: Stack(
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundImage: NetworkImage(
-                        'https://i.pravatar.cc/150?u=11',
+                    const Text(
+                      'Oyin Dolapo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                    Positioned(
-                      left: 12,
-                      child: CircleAvatar(
-                        radius: 10,
-                        backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?u=12',
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 24,
-                      child: CircleAvatar(
-                        radius: 10,
-                        backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?u=13',
-                        ),
-                      ),
+                    Text(
+                      '1hr ago',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
                 ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra',
+              style: TextStyle(fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              clipBehavior: .hardEdge,
+              decoration: BoxDecoration(
+                border: .all(color: Colors.black),
+                borderRadius: BorderRadius.circular(15),
               ),
-              Text(
-                'Liked by you 100+ others',
-                style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+              child: Image.network(
+                'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 200,
               ),
-              const Spacer(),
-              const Icon(Icons.favorite, color: Colors.red, size: 18),
-              const SizedBox(width: 4),
-              const Text('247', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 15),
-              const Icon(Icons.chat_bubble, color: Colors.black, size: 18),
-              const SizedBox(width: 4),
-              const Text('57', style: TextStyle(fontSize: 12)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'View all 57 comments',
-            style: TextStyle(color: Colors.grey[500], fontSize: 11),
-          ),
-        ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 60,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 10,
+                        backgroundImage: NetworkImage(
+                          'https://i.pravatar.cc/150?u=11',
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        child: CircleAvatar(
+                          radius: 10,
+                          backgroundImage: NetworkImage(
+                            'https://i.pravatar.cc/150?u=12',
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 24,
+                        child: CircleAvatar(
+                          radius: 10,
+                          backgroundImage: NetworkImage(
+                            'https://i.pravatar.cc/150?u=13',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'Liked by you 100+ others',
+                  style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+                ),
+                const Spacer(),
+                const Icon(Icons.favorite, color: Colors.red, size: 18),
+                const SizedBox(width: 4),
+                const Text('247', style: TextStyle(fontSize: 12)),
+                const SizedBox(width: 15),
+                const Icon(Icons.chat_bubble, color: Colors.black, size: 18),
+                const SizedBox(width: 4),
+                const Text('57', style: TextStyle(fontSize: 12)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'View all 57 comments',
+              style: TextStyle(color: Colors.grey[500], fontSize: 11),
+            ),
+          ],
+        ),
       ),
     );
   }

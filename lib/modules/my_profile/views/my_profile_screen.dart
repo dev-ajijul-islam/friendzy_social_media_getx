@@ -98,7 +98,7 @@ class MyProfileScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Get.toNamed(AppRoutes.userProfile);
+                        Get.toNamed(AppRoutes.editProfile);
                       },
                       child: const Text(
                         'Edit Profile',
