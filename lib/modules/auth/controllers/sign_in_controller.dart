@@ -57,15 +57,15 @@ class SignInController extends GetxController {
     // }
   }
 
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    forgotEmailController.dispose();
-    phoneController.dispose();
-    lastPasswordController.dispose();
-    super.onClose();
-  }
+  // @override
+  // void onClose() {
+  //   emailController.dispose();
+  //   passwordController.dispose();
+  //   forgotEmailController.dispose();
+  //   phoneController.dispose();
+  //   lastPasswordController.dispose();
+  //   super.onClose();
+  //}
 
   void _clearForm() {
     emailController.clear();

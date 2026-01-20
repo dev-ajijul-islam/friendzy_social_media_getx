@@ -11,9 +11,9 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Future.delayed(
       const Duration(seconds: 3),
-      () => FirebaseServices.auth.currentUser != null
-          ? Get.offAllNamed(AppRoutes.mainLayout)
-          : Get.offAllNamed(AppRoutes.signInScreen),
+      () => FirebaseServices.auth.currentUser == null
+          ? Get.offAllNamed(AppRoutes.signInScreen, predicate: (route) => false)
+          : Get.offAllNamed(AppRoutes.mainLayout, predicate: (route) => false),
     );
 
     return Scaffold(

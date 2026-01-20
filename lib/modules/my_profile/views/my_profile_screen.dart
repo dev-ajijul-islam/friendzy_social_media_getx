@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
@@ -69,8 +70,10 @@ class MyProfileScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.settings_outlined, color: Colors.black87),
-                        onPressed: () {},
+                        icon: const Icon(Icons.logout_outlined, color: Colors.red),
+                        onPressed: () async{
+                         await FirebaseServices.auth.signOut();
+                        },
                       ),
                     ],
                   ),

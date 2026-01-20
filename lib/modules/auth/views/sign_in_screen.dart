@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/auth/views/forgot_password_screen.dart';
+import 'package:friendzy_social_media_getx/modules/auth/widgets/google_sign_in_widget.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
@@ -94,12 +95,7 @@ class SignInScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
-                _buildSocialButton(
-                  "Sign in with Google",
-                  colorScheme,
-                  Icons.g_mobiledata,
-                ),
-
+                GoogleSignInWidget(),
                 const SizedBox(height: 32),
                 Center(
                   child: RichText(
@@ -175,21 +171,4 @@ class SignInScreen extends StatelessWidget {
       ),
     ),
   );
-
-  Widget _buildSocialButton(String label, ColorScheme color, IconData icon) =>
-      SizedBox(
-        width: double.infinity,
-        height: 55,
-        child: OutlinedButton.icon(
-          icon: Icon(icon, size: 30, color: color.onSurface),
-          label: Text(label, style: TextStyle(color: color.onSurface)),
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: color.onSurface.withOpacity(0.2)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onPressed: () {},
-        ),
-      );
 }

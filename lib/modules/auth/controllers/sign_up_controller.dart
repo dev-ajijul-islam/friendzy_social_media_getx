@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
-import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class SignUpController extends GetxController {
@@ -65,15 +64,15 @@ class SignUpController extends GetxController {
     // }
   }
 
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    forgotEmailController.dispose();
-    phoneController.dispose();
-    lastPasswordController.dispose();
-    super.onClose();
-  }
+  // @override
+  // void onClose() {
+  //   emailController.dispose();
+  //   passwordController.dispose();
+  //   forgotEmailController.dispose();
+  //   phoneController.dispose();
+  //   lastPasswordController.dispose();
+  //   super.onClose();
+  // }
 
   void _clearForm() {
     emailController.clear();
