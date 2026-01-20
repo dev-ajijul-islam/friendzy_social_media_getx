@@ -73,6 +73,7 @@ class MyProfileScreen extends StatelessWidget {
                         icon: const Icon(Icons.logout_outlined, color: Colors.red),
                         onPressed: () async{
                          await FirebaseServices.auth.signOut();
+                         Get.offAndToNamed(AppRoutes.signInScreen);
                         },
                       ),
                     ],

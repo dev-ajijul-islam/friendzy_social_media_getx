@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/auth/utils/save_user.dart';
 import 'package:get/get.dart';
 
 class SignUpController extends GetxController {
@@ -35,6 +37,17 @@ class SignUpController extends GetxController {
                 nameController.text.trim(),
               );
             });
+
+        final user = FirebaseServices.auth.currentUser!;
+
+        final UserModel userModel = UserModel(
+          uid: user.uid,
+          fullName: user.displayName ?? "",
+          email: user.email ?? "",
+          profilePic: user.photoURL ?? "",
+        );
+
+        await saveUserIfNotExists(userModel);
         _clearForm();
         await FirebaseServices.auth.signOut();
         Get.back();
