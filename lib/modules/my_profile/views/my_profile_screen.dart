@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
@@ -8,9 +9,11 @@ class MyProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MyProfileController profileController =
+        Get.find<MyProfileController>();
 
     final colorScheme = Theme.of(context).colorScheme;
-    const Color primaryTeal = Color(0xFF006680); // Exact color from your screenshot
+    const Color primaryTeal = Color(0xFF006680);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -45,7 +48,9 @@ class MyProfileScreen extends StatelessWidget {
                     children: [
                       const CircleAvatar(
                         radius: 40,
-                        backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=5'),
+                        backgroundImage: NetworkImage(
+                          'https://i.pravatar.cc/150?u=5',
+                        ),
                       ),
                       const SizedBox(width: 15),
                       const Expanded(
@@ -70,10 +75,13 @@ class MyProfileScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.logout_outlined, color: Colors.red),
-                        onPressed: () async{
-                         await FirebaseServices.auth.signOut();
-                         Get.offAndToNamed(AppRoutes.signInScreen);
+                        icon: const Icon(
+                          Icons.logout_outlined,
+                          color: Colors.red,
+                        ),
+                        onPressed: () async {
+                          await FirebaseServices.auth.signOut();
+                          Get.offAndToNamed(AppRoutes.signInScreen);
                         },
                       ),
                     ],
@@ -136,10 +144,7 @@ class MyProfileScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Text(
                 'Posts',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
 
@@ -177,27 +182,14 @@ class MyProfileScreen extends StatelessWidget {
       children: [
         Text(
           count,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 12,
-          ),
-        ),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
       ],
     );
   }
 
   Widget _buildVerticalDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.grey.shade300,
-    );
+    return Container(height: 30, width: 1, color: Colors.grey.shade300);
   }
 }
