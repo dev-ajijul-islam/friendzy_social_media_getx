@@ -21,7 +21,7 @@ class ForgotPasswordScreen extends StatelessWidget {
         ),
       ),
       body: Form(
-        key: controller.forgotFormKey,
+
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(

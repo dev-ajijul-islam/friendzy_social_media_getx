@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/auth/views/forgot_password_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
+import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 import '../controllers/sign_in_controller.dart';
 
@@ -41,17 +42,15 @@ class SignInScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-        
-                _buildLabel("Email"),
                 TextFormField(
                   controller: controller.emailController,
                   decoration: _inputDecoration("Enter your email", colorScheme),
                   validator: (value) =>
                       GetUtils.isEmail(value!) ? null : "Enter a valid email",
                 ),
-        
+
                 const SizedBox(height: 20),
-                _buildLabel("Password"),
+
                 Obx(
                   () => TextFormField(
                     controller: controller.passwordController,
@@ -74,7 +73,7 @@ class SignInScreen extends StatelessWidget {
                         value!.length < 6 ? "Password must be 6+ chars" : null,
                   ),
                 ),
-        
+
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -85,17 +84,22 @@ class SignInScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-        
+
                 const SizedBox(height: 24),
-                _buildActionButton("Login", colorScheme, controller.login),
-        
+                _buildActionButton(
+                  "Login",
+                  colorScheme,
+                  controller.login,
+                  controller,
+                ),
+
                 const SizedBox(height: 20),
                 _buildSocialButton(
                   "Sign in with Google",
                   colorScheme,
                   Icons.g_mobiledata,
                 ),
-        
+
                 const SizedBox(height: 32),
                 Center(
                   child: RichText(
@@ -104,9 +108,10 @@ class SignInScreen extends StatelessWidget {
                       style: TextStyle(color: colorScheme.onSurface),
                       children: [
                         TextSpan(
-                          recognizer: TapGestureRecognizer()..onTap = (){
-                            Get.toNamed(AppRoutes.signUpScreen);
-                          },
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Get.toNamed(AppRoutes.signUpScreen);
+                            },
                           text: "Sign up",
                           style: TextStyle(
                             color: colorScheme.secondary,
@@ -124,11 +129,6 @@ class SignInScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildLabel(String text) => Padding(
-    padding: const EdgeInsets.only(bottom: 8.0),
-    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w500)),
-  );
 
   InputDecoration _inputDecoration(String hint, ColorScheme color) =>
       InputDecoration(
@@ -149,19 +149,29 @@ class SignInScreen extends StatelessWidget {
     String label,
     ColorScheme color,
     VoidCallback tap,
+    SignInController controller,
   ) => SizedBox(
     width: double.infinity,
     height: 55,
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color.primary,
-        foregroundColor: color.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      onPressed: tap,
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    child: Obx(
+      () => ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color.primary,
+          foregroundColor: color.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: controller.isEmailSignInProgress.value ? null : tap,
+        child: controller.isEmailSignInProgress.value
+            ? ButtonLoading()
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     ),
   );
