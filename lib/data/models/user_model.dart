@@ -15,7 +15,6 @@ class UserModel {
 
   UserModel({
     this.uid,
-
     this.username,
     required this.fullName,
     required this.email,
@@ -47,18 +46,20 @@ class UserModel {
   };
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    uid: json['uid'] ?? '',
-    username: json['username'] ?? '',
-    fullName: json['fullName'] ?? '',
-    email: json['email'] ?? '',
-    profilePic: json['profilePic'] ?? '',
-    bio: json['bio'] ?? '',
-    region: json['region'] ?? '',
-    gender: json['gender'] ?? '',
+    uid: json['uid'],
+    username: json['username'],
+    fullName: json['fullName'],
+    email: json['email'],
+    profilePic: json['profilePic'],
+    bio: json['bio'],
+    region: json['region'],
+    gender: json['gender'],
     followersCount: json['followersCount'] ?? 0,
     followingCount: json['followingCount'] ?? 0,
     postsCount: json['postsCount'] ?? 0,
     isOnline: json['isOnline'] ?? false,
-    lastSeen: DateTime.fromMillisecondsSinceEpoch(json['lastSeen']),
+    lastSeen: DateTime.fromMillisecondsSinceEpoch(
+      json['lastSeen'] ?? DateTime.now().millisecondsSinceEpoch,
+    ),
   );
 }

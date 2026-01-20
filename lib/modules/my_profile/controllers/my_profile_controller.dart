@@ -3,7 +3,7 @@ import 'package:friendzy_social_media_getx/data/services/firebase_services.dart'
 import 'package:get/get.dart';
 
 class MyProfileController extends GetxController {
-  late final UserModel userInfo;
+   Rx<UserModel> userInfo = UserModel(fullName: '--', email: '--').obs;
   RxBool isProfileInfoLoading = true.obs;
 
   final user = FirebaseServices.auth.currentUser;
@@ -13,17 +13,14 @@ class MyProfileController extends GetxController {
         .collection("users")
         .doc(user?.uid)
         .snapshots()
-        .listen(
-          (snapshot) {
-            userInfo = UserModel.fromJson(snapshot.data()!);
-            isProfileInfoLoading.value = false;
-          },
-          onError: (e) {
-            isProfileInfoLoading.value = false;
-          },
-        );
+        .listen((snapshot) {
+          userInfo.value = UserModel.fromJson(snapshot.data()!);
+          print(userInfo.value.bio.runtimeType);
+          isProfileInfoLoading.value = false;
+        }, onError: (e) {
+          isProfileInfoLoading.value = false;
+    });
   }
-
   @override
   void onInit() {
     getProfileInfo();

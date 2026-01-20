@@ -6,6 +6,6 @@ class MainLayoutBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => MainLayoutController());
-    Get.lazyPut(() => MyProfileController());
+    Get.put(MyProfileController());
   }
 }
