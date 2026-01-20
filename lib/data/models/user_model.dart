@@ -11,7 +11,7 @@ class UserModel {
   final int followingCount;
   final int postsCount;
   final bool isOnline;
-  final DateTime lastSeen;
+  final DateTime? lastSeen;
 
   UserModel({
     this.uid,
@@ -27,7 +27,7 @@ class UserModel {
     this.followingCount = 0,
     this.postsCount = 0,
     this.isOnline = false,
-    required this.lastSeen,
+    this.lastSeen,
   });
 
   Map<String, dynamic> toJson() => {
@@ -43,7 +43,7 @@ class UserModel {
     'followingCount': followingCount,
     'postsCount': postsCount,
     'isOnline': isOnline,
-    'lastSeen': lastSeen.millisecondsSinceEpoch,
+    'lastSeen': lastSeen?.millisecondsSinceEpoch,
   };
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(

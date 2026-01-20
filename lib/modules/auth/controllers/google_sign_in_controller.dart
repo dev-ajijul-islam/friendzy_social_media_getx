@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/auth/utils/save_user.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -32,16 +34,16 @@ class GoogleSignInController extends GetxController {
 
       if (userCredential.user == null) return;
 
-      //final user = FirebaseServices.auth.currentUser!;
+      final user = FirebaseServices.auth.currentUser!;
 
-      // final UserModel userModel = UserModel(
-      //   uid: user.uid,
-      //   displayName: user.displayName ?? "",
-      //   email: user.email ?? "",
-      //   photoURL: user.photoURL ?? "",
-      // );
-      //
-      // await saveUserIfNotExists(userModel);
+      final UserModel userModel = UserModel(
+        uid: user.uid,
+        fullName: user.displayName ?? "",
+        email: user.email ?? "",
+        profilePic: user.photoURL ?? "",
+      );
+
+      await saveUserIfNotExists(userModel);
 
       Get.offNamedUntil(AppRoutes.mainLayout, (route) => false);
 
