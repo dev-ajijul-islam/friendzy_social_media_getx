@@ -30,7 +30,7 @@ class UserModel {
     required this.lastSeen,
   });
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
     'uid': uid,
     'username': username,
     'fullName': fullName,
@@ -46,19 +46,19 @@ class UserModel {
     'lastSeen': lastSeen.millisecondsSinceEpoch,
   };
 
-  factory UserModel.fromMap(Map<String, dynamic> map) => UserModel(
-    uid: map['uid'] ?? '',
-    username: map['username'] ?? '',
-    fullName: map['fullName'] ?? '',
-    email: map['email'] ?? '',
-    profilePic: map['profilePic'] ?? '',
-    bio: map['bio'] ?? '',
-    region: map['region'] ?? '',
-    gender: map['gender'] ?? '',
-    followersCount: map['followersCount'] ?? 0,
-    followingCount: map['followingCount'] ?? 0,
-    postsCount: map['postsCount'] ?? 0,
-    isOnline: map['isOnline'] ?? false,
-    lastSeen: DateTime.fromMillisecondsSinceEpoch(map['lastSeen']),
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+    uid: json['uid'] ?? '',
+    username: json['username'] ?? '',
+    fullName: json['fullName'] ?? '',
+    email: json['email'] ?? '',
+    profilePic: json['profilePic'] ?? '',
+    bio: json['bio'] ?? '',
+    region: json['region'] ?? '',
+    gender: json['gender'] ?? '',
+    followersCount: json['followersCount'] ?? 0,
+    followingCount: json['followingCount'] ?? 0,
+    postsCount: json['postsCount'] ?? 0,
+    isOnline: json['isOnline'] ?? false,
+    lastSeen: DateTime.fromMillisecondsSinceEpoch(json['lastSeen']),
   );
 }
