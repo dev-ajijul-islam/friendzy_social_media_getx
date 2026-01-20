@@ -14,21 +14,29 @@ class GoogleSignInWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 50,
-      child: OutlinedButton.icon(
-        icon: Icon(Icons.g_mobiledata, size: 30, color: color.onSurface),
-        label: controller.inProcess.value
-            ? ButtonLoading()
-            : Text(
-                "Sign in with Google",
-                style: TextStyle(color: color.onSurface),
-              ),
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: color.onSurface.withOpacity(0.2)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: Obx(
+        () => OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: color.onSurface.withOpacity(0.2)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
+          onPressed: controller.inProcess.value ? null : controller.signIn,
+
+          child: controller.inProcess.value
+              ? ButtonLoading()
+              : Row(
+                  mainAxisAlignment: .center,
+                  children: [
+                    Icon(Icons.g_mobiledata, size: 30, color: color.onSurface),
+                    Text(
+                      "Sign in with Google",
+                      style: TextStyle(color: color.onSurface),
+                    ),
+                  ],
+                ),
         ),
-        onPressed: controller.inProcess.value ? null : controller.signIn,
       ),
     );
   }
