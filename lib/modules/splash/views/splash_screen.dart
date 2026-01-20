@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/auth/views/sign_in_screen.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
@@ -9,7 +11,9 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Future.delayed(
       const Duration(seconds: 3),
-      () => Get.offAndToNamed(AppRoutes.welcomeScreen),
+      () => FirebaseServices.auth.currentUser != null
+          ? Get.offAllNamed(AppRoutes.mainLayout)
+          : Get.offAllNamed(AppRoutes.signInScreen),
     );
 
     return Scaffold(

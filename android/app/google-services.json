@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "801153267490",
+    "project_id": "friendzy-social-f0857",
+    "storage_bucket": "friendzy-social-f0857.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801153267490:android:d17d337c7b28db95a1d77b",
+        "android_client_info": {
+          "package_name": "com.devajijulislam.friendzy.friendzy_social_media_getx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801153267490-bd268h9s9o6t1pcok4lsp2is1lqsm8h1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFpMS-QO1fViS8YzAO_kr43olSJVe3XVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801153267490-bd268h9s9o6t1pcok4lsp2is1lqsm8h1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
