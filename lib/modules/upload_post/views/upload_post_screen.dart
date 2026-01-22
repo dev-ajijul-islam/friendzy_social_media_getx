@@ -89,13 +89,65 @@ class UploadPostScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              _buildLabel("Add hastags"),
-              _buildInputField(hint: "", controller.hashTagController, (value) {
-                if (value.isEmpty) {
-                  return "Enter a Tags here..";
-                }
-                return null;
-              }),
+              _buildLabel("Add has tags"),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildInputField(
+                      onSubmit: (value) => controller.addTag,
+                      hint: "",
+                      controller.hashTagController,
+                      (value) {
+                        if (value.isEmpty) {
+                          return "Enter a Tags here..";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      controller.addTag();
+                    },
+                    icon: Icon(Icons.add, color: Colors.white),
+                    style: .new(
+                      backgroundColor: WidgetStatePropertyAll(
+                        colorScheme.secondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Obx(
+                () => SizedBox(
+                  height: 40,
+                  child: ListView.separated(
+                    scrollDirection: .horizontal,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () => controller.removeTag(index),
+                      child: Chip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: .circular(100),
+                        ),
+                        label: Row(
+                          spacing: 5,
+                          children: [
+                            Text(controller.hashtags[index]),
+                            Icon(Icons.close, size: 14, color: Colors.grey),
+                          ],
+                        ),
+                        side: .none,
+                        color: WidgetStatePropertyAll(
+                          colorScheme.secondary.withAlpha(300),
+                        ),
+                      ),
+                    ),
+                    separatorBuilder: (context, index) => SizedBox(width: 2),
+                    itemCount: controller.hashtags.length,
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 40),
 
@@ -154,8 +206,10 @@ class UploadPostScreen extends StatelessWidget {
     FormFieldValidator? validator, {
     required String hint,
     int maxLines = 1,
+    ValueChanged? onSubmit,
   }) {
     return TextFormField(
+      onFieldSubmitted: onSubmit,
       validator: validator,
       controller: controller,
       maxLines: maxLines,
