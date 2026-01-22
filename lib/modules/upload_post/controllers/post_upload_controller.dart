@@ -48,14 +48,12 @@ class PostUploadController extends GetxController {
     }
   }
 
-
-  void addTag(){
+  void addTag() {
     hashtags.add(hashTagController.text.trim());
     hashTagController.clear();
   }
 
-  void removeTag(int index){
+  void removeTag(int index) {
     hashtags.removeAt(index);
-    print("----------------------------------");
   }
 }

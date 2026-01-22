@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/post_upload_controller.dart';
+import 'package:friendzy_social_media_getx/utils/upload_image.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
@@ -55,16 +56,19 @@ class UploadPostScreen extends StatelessWidget {
                     Positioned(
                       bottom: 12,
                       right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF006680)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          color: Color(0xFF006680),
-                          size: 20,
+                      child: InkWell(
+                        onTap: () => uploadImage(),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFF006680)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Color(0xFF006680),
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
