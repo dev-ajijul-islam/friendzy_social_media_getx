@@ -3,7 +3,7 @@ import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 class PostModel {
   UserModel author;
   String caption;
-  List<String> images;
+  List<String>? images;
   List<String>? hashTags;
   List<String>? likerIds;
   List<String>? commenterIds;
@@ -12,7 +12,7 @@ class PostModel {
   PostModel({
     required this.author,
     required this.caption,
-    required this.images,
+    this.images,
     this.likerIds,
     this.commenterIds,
     this.hashTags,
@@ -33,12 +33,12 @@ class PostModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "author": author,
+      "author": author.toJson(),
       "caption": caption,
-      "commenterIds": commenterIds,
-      "hashTags": hashTags,
-      "likerIds": likerIds,
-      "images": images,
+      "commenterIds": commenterIds ?? [],
+      "hashTags": hashTags ?? [],
+      "likerIds": likerIds ?? [],
+      "images": images ?? [],
       "createdAt": createdAt,
     };
   }
