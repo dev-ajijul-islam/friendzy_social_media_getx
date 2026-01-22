@@ -131,7 +131,6 @@ class PostCard extends StatelessWidget {
       );
     }
 
-
     return Stack(
       children: [
         GridView.builder(
@@ -158,7 +157,7 @@ class PostCard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withAlpha(50),
               child: Center(
                 child: Text(
                   '+${imageCount - 4}',
@@ -218,7 +217,8 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRoutes.postDetailsScreen),
+      onTap: () =>
+          Get.toNamed(AppRoutes.postDetailsScreen, arguments: postModel),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -320,7 +320,7 @@ class PostCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'View all 57 comments',
+              'View all ${postModel.commenterIds?.length} comments',
               style: TextStyle(color: Colors.grey[500], fontSize: 11),
             ),
           ],
