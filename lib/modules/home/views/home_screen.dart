@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
@@ -8,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    final GetAllPostController postController = Get.find<GetAllPostController>();
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -21,7 +22,7 @@ class HomeScreen extends StatelessWidget {
 
             _buildStoriesSection(),
 
-            _buildFeedSection(colorScheme),
+            _buildFeedSection(colorScheme,postController),
           ],
         ),
       ),
@@ -175,14 +176,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeedSection(ColorScheme colorScheme) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 2,
-      itemBuilder: (context, index) {
-        return _buildPostCard(colorScheme);
-      },
+  Widget _buildFeedSection(ColorScheme colorScheme,GetAllPostController postController) {
+    return Obx(
+      () =>  ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: postController.posts.length,
+        itemBuilder: (context, index) {
+          final post = postController.posts[index];
+          return _buildPostCard(colorScheme);
+        },
+      ),
     );
   }
 

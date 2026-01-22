@@ -14,16 +14,25 @@ class GetAllPostController extends GetxController {
   RxList<PostModel> posts = <PostModel>[].obs;
 
   void getAllPost() async {
-    FirebaseServices.firestore.collectionGroup("posts").snapshots().listen((
-      snapshot,
-    ) {
-      posts.value = snapshot.docs
-          .map((doc) => PostModel.fromJson(doc.data()))
-          .toList();
-      isLoading.value = false;
-    },onError: (e){
-      isLoading.value = false;
-      Get.snackbar("Failed", e.toString(),colorText: Colors.white,backgroundColor: Colors.green);
-    });
+    FirebaseServices.firestore
+        .collectionGroup("posts")
+        .snapshots()
+        .listen(
+          (snapshot) {
+            posts.value = snapshot.docs
+                .map((doc) => PostModel.fromJson(doc.data()))
+                .toList();
+            isLoading.value = false;
+          },
+          onError: (e) {
+            isLoading.value = false;
+            Get.snackbar(
+              "Failed",
+              e.toString(),
+              colorText: Colors.white,
+              backgroundColor: Colors.green,
+            );
+          },
+        );
   }
 }
