@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/controllers/image_upload_controller.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/post_upload_controller.dart';
-import 'package:friendzy_social_media_getx/utils/upload_image.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +11,7 @@ class UploadPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final PostUploadController controller = Get.find<PostUploadController>();
+    final ImageUploadController imageUploadController = Get.find<ImageUploadController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -57,7 +58,7 @@ class UploadPostScreen extends StatelessWidget {
                       bottom: 12,
                       right: 12,
                       child: InkWell(
-                        onTap: () => uploadImage(),
+                        onTap: () => imageUploadController.uploadImage(),
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
