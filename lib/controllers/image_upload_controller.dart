@@ -7,14 +7,15 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
+enum Reason { post, profile, message }
+
 class ImageUploadController extends GetxController {
   final PostUploadController postUploadController =
       Get.find<PostUploadController>();
   RxBool isUploading = false.obs;
 
-  Future<String?> uploadImage() async {
+  Future<void> uploadImage({required Reason reason}) async {
     ImagePicker imagePicker = .new();
-    String? uploadedUrl;
 
     void handleUpload(ImageSource source) async {
       try {
@@ -30,7 +31,16 @@ class ImageUploadController extends GetxController {
           body: {"image": base64Encode(await imageBytes)},
         );
         final decoded = jsonDecode(response.body);
-        uploadedUrl = decoded["data"]["url"];
+        if (reason == Reason.post) {
+          postUploadController.images.add(decoded["data"]["url"]);
+        }
+        Get.back();
+        Get.snackbar(
+          "Success",
+          "Image uploaded",
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+        );
       } catch (e) {
         debugPrint(e.toString());
       } finally {
@@ -92,6 +102,5 @@ class ImageUploadController extends GetxController {
         ),
       ),
     );
-    return uploadedUrl;
   }
 }

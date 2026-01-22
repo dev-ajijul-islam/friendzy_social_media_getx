@@ -11,7 +11,8 @@ class UploadPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final PostUploadController controller = Get.find<PostUploadController>();
-    final ImageUploadController imageUploadController = Get.find<ImageUploadController>();
+    final ImageUploadController imageUploadController =
+        Get.find<ImageUploadController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -40,9 +41,9 @@ class UploadPostScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-
               _buildLabel("Select Image(s)"),
               Container(
+                clipBehavior: .hardEdge,
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -53,12 +54,38 @@ class UploadPostScreen extends StatelessWidget {
                   ),
                 ),
                 child: Stack(
+                  clipBehavior: .hardEdge,
                   children: [
+                    Positioned.fill(
+                      child: SizedBox(
+                        width: Get.mediaQuery.size.width,
+                        child: Obx(
+                          () => GridView.builder(
+                            itemCount: controller.images.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                ),
+                            itemBuilder: (context, index) {
+                              final image = controller.images[index];
+                              return Card(
+                                clipBehavior: .hardEdge,
+                                child: Image.network(image, fit: .fill),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                     Positioned(
                       bottom: 12,
                       right: 12,
                       child: InkWell(
-                        onTap: () => imageUploadController.uploadImage(),
+                        onTap: () {
+                          imageUploadController.uploadImage(
+                            reason: Reason.post,
+                          );
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -103,7 +130,7 @@ class UploadPostScreen extends StatelessWidget {
                       hint: "",
                       controller.hashTagController,
                       (value) {
-                        if (value.isEmpty) {
+                        if (controller.hashtags.isEmpty) {
                           return "Enter a Tags here..";
                         }
                         return null;

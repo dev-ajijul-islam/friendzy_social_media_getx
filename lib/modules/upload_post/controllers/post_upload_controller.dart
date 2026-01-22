@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_layout_controller.dart';
 import 'package:get/get.dart';
 
 class PostUploadController extends GetxController {
@@ -13,6 +14,9 @@ class PostUploadController extends GetxController {
   final GlobalKey<FormState> postFormKey = GlobalKey<FormState>();
   final TextEditingController captionController = .new();
   final TextEditingController hashTagController = .new();
+
+  final MainLayoutController mainLayoutController =
+      Get.find<MainLayoutController>();
 
   Future<void> createPost() async {
     if (postFormKey.currentState!.validate()) {
@@ -39,6 +43,17 @@ class PostUploadController extends GetxController {
             .doc(FirebaseServices.auth.currentUser?.uid)
             .collection("posts")
             .add(postModel.toJson());
+        images.close();
+        captionController.clear();
+        hashTagController.clear();
+        hashtags.clear();
+        mainLayoutController.selectedIndex.value = 0;
+        Get.snackbar(
+          "Success",
+          "Your post has been uploaded",
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+        );
       } on FirebaseException catch (e) {
         debugPrint(e.message.toString());
         Get.snackbar("Failed", e.message.toString());
