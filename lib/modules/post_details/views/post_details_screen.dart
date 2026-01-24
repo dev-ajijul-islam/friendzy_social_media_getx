@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/comment_model.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
+import 'package:friendzy_social_media_getx/modules/post_details/controllers/create_comment_controller.dart';
+import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
 class PostDetailsScreen extends StatelessWidget {
-  const PostDetailsScreen({super.key});
+  PostDetailsScreen({super.key});
+
+  final CreateCommentController commentController =
+      Get.find<CreateCommentController>();
 
   @override
   Widget build(BuildContext context) {
     final PostModel postModel = Get.arguments;
+
+    final currentUser = FirebaseServices.auth.currentUser;
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -80,16 +90,58 @@ class PostDetailsScreen extends StatelessWidget {
           ),
           Positioned(
             child: Container(
-              color: Colors.white,
-              width: .maxFinite,
-              child: TextFormField(
-                decoration: .new(
-                  suffixIcon: Icon(Icons.send),
-                  hintText: 'Type your comment...',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                  prefixIcon: Icon(Icons.comment, color: Color(0xFF006680)),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 15),
+              color: Colors.grey[200],
+              child: Form(
+                key: commentController.commentFormKey,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: commentController.commentTEController,
+                        decoration: InputDecoration(
+                          hintText: 'Type your comment...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Obx(
+                      () => IconButton(
+                        onPressed: () {
+                          if (!commentController.isLoading.value &&
+                              commentController.commentTEController.text
+                                  .trim()
+                                  .isNotEmpty) {
+                            final comment = CommentModel(
+                              commentAuthor: UserModel(
+                                fullName: currentUser!.displayName.toString(),
+                                email: currentUser.email.toString(),
+                                uid: currentUser.uid,
+                                profilePic: currentUser.photoURL,
+                              ),
+                              postAuthor: postModel.author,
+                              postId: postModel.postId.toString(),
+                              comment: commentController.commentTEController.text,
+                              likerIds: [],
+                              createdAt: DateTime.now(),
+                            );
+                            commentController.createComment(comment: comment);
+                          }
+                        },
+                        icon: commentController.isLoading.value
+                            ? ButtonLoading()
+                            : Icon(Icons.send, color: Colors.blue),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

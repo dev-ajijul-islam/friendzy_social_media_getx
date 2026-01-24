@@ -19,12 +19,14 @@ class CreateCommentController extends GetxController {
           .doc(comment.postId)
           .collection("comments")
           .add(comment.toJson());
+
       Get.snackbar(
         "Success",
         "Comment uploaded",
         colorText: Colors.white,
         backgroundColor: Colors.green,
       );
+      commentTEController.clear();
     } on FirebaseException catch (e) {
       Get.snackbar(
         "Failed",
