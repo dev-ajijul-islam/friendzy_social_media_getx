@@ -43,11 +43,18 @@ class PostUploadController extends GetxController {
             .doc(FirebaseServices.auth.currentUser?.uid)
             .collection("posts")
             .add(postModel.toJson());
+
+        await FirebaseServices.firestore
+            .collection("users")
+            .doc(FirebaseServices.auth.currentUser?.uid)
+            .update({"postsCount": FieldValue.increment(1)});
+
         images.close();
         captionController.clear();
         hashTagController.clear();
         hashtags.clear();
         mainLayoutController.selectedIndex.value = 0;
+
         Get.snackbar(
           "Success",
           "Your post has been uploaded",
