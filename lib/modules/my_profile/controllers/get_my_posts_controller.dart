@@ -12,7 +12,7 @@ class GetMyPostsController extends GetxController {
     super.onInit();
   }
 
-  void getMyPosts(){
+  void getMyPosts() {
     FirebaseServices.firestore
         .collection("users")
         .doc(FirebaseServices.auth.currentUser?.uid)
@@ -20,7 +20,9 @@ class GetMyPostsController extends GetxController {
         .snapshots()
         .listen((snapshot) {
           myPosts = snapshot.docs
-              .map((doc) => PostModel.fromJson({...doc.data(),"postId" : doc.id}))
+              .map(
+                (doc) => PostModel.fromJson({...doc.data(), "postId": doc.id}),
+              )
               .toList();
           isLoading.value = false;
         });

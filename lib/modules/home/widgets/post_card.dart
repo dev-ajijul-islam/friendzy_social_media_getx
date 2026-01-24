@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
+import 'package:friendzy_social_media_getx/utils/get_time_ago.dart';
 import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
 import 'package:friendzy_social_media_getx/widgets/like_button.dart';
 import 'package:get/get.dart';
@@ -278,7 +279,7 @@ class PostCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '1hr ago',
+                      getTimeAgo((postModel.createdAt)),
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
@@ -345,7 +346,7 @@ class PostCard extends StatelessWidget {
                   style: TextStyle(fontSize: 12),
                 ),
                 const SizedBox(width: 15),
-                CommentButton(),
+                CommentButton(postModel: postModel),
                 const SizedBox(width: 4),
                 Text(
                   postModel.commentsCount.toString(),
