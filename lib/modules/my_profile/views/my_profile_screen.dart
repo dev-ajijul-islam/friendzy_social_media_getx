@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_posts_controller.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
@@ -12,8 +14,10 @@ class MyProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final MyProfileController profileController =
         Get.find<MyProfileController>();
+    final GetMyPostsController myPostsController =
+        Get.find<GetMyPostsController>();
 
-    final UserModel? userInfo = profileController.userInfo.value;
+    final UserModel userInfo = profileController.userInfo.value;
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -180,18 +184,40 @@ class MyProfileScreen extends StatelessWidget {
                 ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
                   childAspectRatio: 1,
                 ),
-                itemCount: 12,
+                itemCount: myPostsController.myPosts.length,
                 itemBuilder: (context, index) {
+                  if (myPostsController.isLoading.value) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (myPostsController.myPosts.isEmpty) {
+                    return Center(child: Text("There is no post yet"));
+                  }
+
+                  final PostModel post = myPostsController.myPosts[index];
+
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      'https://picsum.photos/200/200?random=$index',
-                      fit: BoxFit.cover,
-                    ),
+                    child: post.images!.isEmpty
+                        ? Card(
+                            child: Center(
+                              child: Text(
+                                post.caption.length > 15
+                                    ? "${post.caption.substring(0, 15)}.."
+                                    : post.caption,
+                                textAlign: .center,
+                              ),
+                            ),
+                          )
+                        : Card(
+                            clipBehavior: .hardEdge,
+                            child: Image.network(
+                              post.images!.first.toString(),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                   );
                 },
               ),
