@@ -198,26 +198,29 @@ class MyProfileScreen extends StatelessWidget {
 
                   final PostModel post = myPostsController.myPosts[index];
 
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: post.images!.isEmpty
-                        ? Card(
-                            child: Center(
-                              child: Text(
-                                post.caption.length > 15
-                                    ? "${post.caption.substring(0, 15)}.."
-                                    : post.caption,
-                                textAlign: .center,
+                  return GestureDetector(
+                    onTap: () => Get.toNamed(AppRoutes.postDetailsScreen,arguments: post),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: post.images!.isEmpty
+                          ? Card(
+                              child: Center(
+                                child: Text(
+                                  post.caption.length > 15
+                                      ? "${post.caption.substring(0, 15)}.."
+                                      : post.caption,
+                                  textAlign: .center,
+                                ),
+                              ),
+                            )
+                          : Card(
+                              clipBehavior: .hardEdge,
+                              child: Image.network(
+                                post.images!.first.toString(),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          )
-                        : Card(
-                            clipBehavior: .hardEdge,
-                            child: Image.network(
-                              post.images!.first.toString(),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                    ),
                   );
                 },
               ),

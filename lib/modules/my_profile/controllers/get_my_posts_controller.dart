@@ -20,7 +20,7 @@ class GetMyPostsController extends GetxController {
         .snapshots()
         .listen((snapshot) {
           myPosts = snapshot.docs
-              .map((doc) => PostModel.fromJson(doc.data()))
+              .map((doc) => PostModel.fromJson({...doc.data(),"postId" : doc.id}))
               .toList();
           isLoading.value = false;
         });
