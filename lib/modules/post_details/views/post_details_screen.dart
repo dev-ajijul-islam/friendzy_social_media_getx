@@ -20,7 +20,6 @@ class PostDetailsScreen extends StatelessWidget {
 
     final currentUser = FirebaseServices.auth.currentUser;
 
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -74,18 +73,53 @@ class PostDetailsScreen extends StatelessWidget {
                           return PostCard(postModel: post);
                         },
                       ),
-                      _buildCommentItem(
-                        "Chris uil",
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
-                        "2 hrs Ago",
-                        "25",
-                        "https://i.pravatar.cc/150?u=11",
+                      StreamBuilder(
+                        stream: FirebaseServices.firestore
+                            .collection("users")
+                            .doc(postModel.author.uid)
+                            .collection("posts")
+                            .doc(postModel.postId)
+                            .collection("comments")
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.hasError || !snapshot.hasData) {
+                            return Center(child: Text("Something went wrong"));
+                          }
+
+                          if (snapshot.data!.docs.isEmpty) {
+                            return Column(
+                              children: [
+                                SizedBox(height: 50),
+                                Center(child: Text("No comment yet")),
+                              ],
+                            );
+                          }
+
+                          return Column(
+                            children: List.generate(
+                              snapshot.data!.docs.length,
+                              (index) {
+                                final CommentModel comment =
+                                    CommentModel.fromJson(
+                                      snapshot.data!.docs[index].data(),
+                                    );
+
+                                return _buildCommentItem(comment: comment);
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 60),
             ],
           ),
           Positioned(
@@ -129,7 +163,8 @@ class PostDetailsScreen extends StatelessWidget {
                               ),
                               postAuthor: postModel.author,
                               postId: postModel.postId.toString(),
-                              comment: commentController.commentTEController.text,
+                              comment:
+                                  commentController.commentTEController.text,
                               likerIds: [],
                               createdAt: DateTime.now(),
                             );
@@ -151,19 +186,18 @@ class PostDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCommentItem(
-    String name,
-    String comment,
-    String time,
-    String likes,
-    String img,
-  ) {
+  Widget _buildCommentItem({required CommentModel comment}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(radius: 20, backgroundImage: NetworkImage(img)),
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: NetworkImage(
+              comment.commentAuthor.profilePic.toString(),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -173,21 +207,21 @@ class PostDetailsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      name,
+                      comment.commentAuthor.fullName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     Text(
-                      time,
+                      comment.createdAt.toString(),
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  comment,
+                  comment.comment,
                   style: const TextStyle(
                     fontSize: 11,
                     color: Colors.black87,
@@ -200,7 +234,7 @@ class PostDetailsScreen extends StatelessWidget {
                     const Icon(Icons.favorite, color: Colors.red, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      likes,
+                      comment.likerIds.length.toString(),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,

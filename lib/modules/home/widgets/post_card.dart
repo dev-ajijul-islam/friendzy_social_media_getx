@@ -348,14 +348,14 @@ class PostCard extends StatelessWidget {
                 CommentButton(),
                 const SizedBox(width: 4),
                 Text(
-                  postModel.commenterIds!.length.toString(),
+                  postModel.commentsCount.toString(),
                   style: TextStyle(fontSize: 12),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              'View all ${postModel.commenterIds?.length} comments',
+              'View all ${postModel.commentsCount.toString()} comments',
               style: TextStyle(color: Colors.grey[500], fontSize: 11),
             ),
           ],

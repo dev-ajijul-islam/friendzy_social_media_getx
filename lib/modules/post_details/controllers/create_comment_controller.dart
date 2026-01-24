@@ -20,6 +20,13 @@ class CreateCommentController extends GetxController {
           .collection("comments")
           .add(comment.toJson());
 
+      await FirebaseServices.firestore
+          .collection("users")
+          .doc(comment.postAuthor.uid)
+          .collection("posts")
+          .doc(comment.postId)
+          .update({"commentsCount": FieldValue.increment(1)});
+
       Get.snackbar(
         "Success",
         "Comment uploaded",

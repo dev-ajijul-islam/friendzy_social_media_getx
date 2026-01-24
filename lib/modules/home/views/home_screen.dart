@@ -182,8 +182,15 @@ class HomeScreen extends StatelessWidget {
     ColorScheme colorScheme,
     GetAllPostController postController,
   ) {
-    return Obx(
-      () => ListView.builder(
+    return Obx(() {
+      if (postController.isLoading.value) {
+        return Center(child: CircularProgressIndicator());
+      }
+      if (postController.posts.isEmpty) {
+        return Center(child: Text("There is no post yet"));
+      }
+
+      return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: postController.posts.length,
@@ -191,7 +198,7 @@ class HomeScreen extends StatelessWidget {
           final post = postController.posts[index];
           return PostCard(postModel: post);
         },
-      ),
-    );
+      );
+    });
   }
 }

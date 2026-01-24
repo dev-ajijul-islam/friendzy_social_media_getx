@@ -8,7 +8,7 @@ class PostModel {
   List<String>? images;
   List<String>? hashTags;
   List<String>? likerIds;
-  List<String>? commenterIds;
+  int? commentsCount;
   DateTime createdAt;
 
   PostModel({
@@ -17,7 +17,7 @@ class PostModel {
     required this.caption,
     this.images,
     this.likerIds,
-    this.commenterIds,
+    this.commentsCount,
     this.hashTags,
     required this.createdAt,
   });
@@ -31,7 +31,7 @@ class PostModel {
       postId: json["postId"],
       author: UserModel.fromJson(json["author"]),
       caption: json["caption"],
-      commenterIds: stringify(json["commenterIds"]),
+      commentsCount:json["commentsCount"],
       hashTags: stringify(json["hashTags"]),
       likerIds: stringify(json["likerIds"]),
       images: stringify(json["images"]),
@@ -43,7 +43,7 @@ class PostModel {
     return {
       "author": author.toJson(),
       "caption": caption,
-      "commenterIds": commenterIds ?? [],
+      "commentsCount": commentsCount ?? 0,
       "hashTags": hashTags ?? [],
       "likerIds": likerIds ?? [],
       "images": images ?? [],
