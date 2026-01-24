@@ -5,6 +5,7 @@ import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/create_comment_controller.dart';
+import 'package:friendzy_social_media_getx/utils/get_time_ago.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
@@ -214,7 +215,7 @@ class PostDetailsScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      comment.createdAt.toString(),
+                      getTimeAgo(comment.createdAt),
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                   ],
