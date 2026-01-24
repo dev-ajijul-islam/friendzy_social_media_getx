@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:friendzy_social_media_getx/utils/get_time_ago.dart';
@@ -303,42 +304,6 @@ class PostCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const SizedBox(
-                  width: 60,
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 10,
-                        backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?u=11',
-                        ),
-                      ),
-                      Positioned(
-                        left: 12,
-                        child: CircleAvatar(
-                          radius: 10,
-                          backgroundImage: NetworkImage(
-                            'https://i.pravatar.cc/150?u=12',
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 24,
-                        child: CircleAvatar(
-                          radius: 10,
-                          backgroundImage: NetworkImage(
-                            'https://i.pravatar.cc/150?u=13',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  'Liked by you 100+ others',
-                  style: TextStyle(fontSize: 10, color: Colors.grey[700]),
-                ),
-                const Spacer(),
                 LikeButton(post: postModel),
                 const SizedBox(width: 4),
                 Text(
@@ -351,6 +316,15 @@ class PostCard extends StatelessWidget {
                 Text(
                   postModel.commentsCount.toString(),
                   style: TextStyle(fontSize: 12),
+                ),
+                Spacer(),
+                Text(
+                  postModel.likerIds!.contains(
+                        FirebaseServices.auth.currentUser?.uid,
+                      )
+                      ? "Liked by you ${(postModel.likerIds!.length - 1)}+ others"
+                      : 'Liked by ${postModel.likerIds!.length}+ users',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
               ],
             ),
