@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
 import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
 import 'package:friendzy_social_media_getx/widgets/like_button.dart';
@@ -271,27 +272,36 @@ class PostDetailsScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildMainPost(postModel, primaryTeal),
+                  StreamBuilder(
+                    stream: FirebaseServices.firestore
+                        .collection("users")
+                        .doc(postModel.author.uid)
+                        .collection("posts")
+                        .doc(postModel.postId)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                      if (snapshot.hasError || !snapshot.hasData) {
+                        return Center(child: Text("Post not found"));
+                      }
+
+                      final post = PostModel.fromJson({
+                        ...snapshot.data!.data()!,
+                        "postId": snapshot.data?.id,
+                      });
+
+                      return _buildMainPost(post, primaryTeal);
+                    },
+                  ),
                   _buildCommentItem(
                     "Chris uil",
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
                     "2hrs Ago",
                     "25",
                     "https://i.pravatar.cc/150?u=11",
-                  ),
-                  _buildCommentItem(
-                    "Joe Mickey",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
-                    "2hrs Ago",
-                    "25",
-                    "https://i.pravatar.cc/150?u=12",
-                  ),
-                  _buildCommentItem(
-                    "General Focus",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
-                    "2hrs Ago",
-                    "25",
-                    "https://i.pravatar.cc/150?u=13",
                   ),
                 ],
               ),
@@ -302,7 +312,7 @@ class PostDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMainPost(PostModel postModel, Color primaryColor) {
+  Widget _buildMainPost(PostModel post, Color primaryColor) {
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(15),
@@ -318,8 +328,7 @@ class PostDetailsScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 20,
                 backgroundImage: NetworkImage(
-                  postModel.author.profilePic ??
-                      'https://i.pravatar.cc/150?u=5',
+                  post.author.profilePic ?? 'https://i.pravatar.cc/150?u=5',
                 ),
               ),
               const SizedBox(width: 10),
@@ -327,7 +336,7 @@ class PostDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    postModel.author.fullName,
+                    post.author.fullName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -342,12 +351,9 @@ class PostDetailsScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            postModel.caption,
-            style: const TextStyle(fontSize: 12, height: 1.4),
-          ),
+          Text(post.caption, style: const TextStyle(fontSize: 12, height: 1.4)),
           const SizedBox(height: 12),
-          _buildImageGrid(postModel),
+          _buildImageGrid(post),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -387,17 +393,17 @@ class PostDetailsScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 9, color: Colors.grey),
               ),
               const Spacer(),
-              LikeButton(post: postModel,),
+              LikeButton(post: post),
               const SizedBox(width: 4),
               Text(
-                postModel.likerIds!.length.toString(),
+                post.likerIds!.length.toString(),
                 style: TextStyle(fontSize: 11),
               ),
               const SizedBox(width: 12),
               CommentButton(),
               const SizedBox(width: 4),
               Text(
-                postModel.commenterIds!.length.toString(),
+                post.commenterIds!.length.toString(),
                 style: TextStyle(fontSize: 11),
               ),
             ],
