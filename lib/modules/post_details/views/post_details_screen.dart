@@ -30,44 +30,67 @@ class PostDetailsScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
+        alignment: .bottomCenter,
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  StreamBuilder(
-                    stream: FirebaseServices.firestore
-                        .collection("users")
-                        .doc(postModel.author.uid)
-                        .collection("posts")
-                        .doc(postModel.postId)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      StreamBuilder(
+                        stream: FirebaseServices.firestore
+                            .collection("users")
+                            .doc(postModel.author.uid)
+                            .collection("posts")
+                            .doc(postModel.postId)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
 
-                      if (snapshot.hasError || !snapshot.hasData) {
-                        return Center(child: Text("Post not found"));
-                      }
+                          if (snapshot.hasError || !snapshot.hasData) {
+                            return Center(child: Text("Post not found"));
+                          }
 
-                      final post = PostModel.fromJson({
-                        ...snapshot.data!.data()!,
-                        "postId": snapshot.data?.id,
-                      });
+                          final post = PostModel.fromJson({
+                            ...snapshot.data!.data()!,
+                            "postId": snapshot.data?.id,
+                          });
 
-                      return PostCard(postModel: post);
-                    },
+                          return PostCard(postModel: post);
+                        },
+                      ),
+                      _buildCommentItem(
+                        "Chris uil",
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
+                        "2 hrs Ago",
+                        "25",
+                        "https://i.pravatar.cc/150?u=11",
+                      ),
+                    ],
                   ),
-                  _buildCommentItem(
-                    "Chris uil",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pharetra aliquam, congue habitasse tortor. Fringilla nunc aliquam volutpat suscipit porttitor in quis sagittis hac. Tellus sed ac libero",
-                    "2hrs Ago",
-                    "25",
-                    "https://i.pravatar.cc/150?u=11",
-                  ),
-                ],
+                ),
+              ),
+              SizedBox(height: 30),
+            ],
+          ),
+          Positioned(
+            child: Container(
+              color: Colors.white,
+              width: .maxFinite,
+              child: TextFormField(
+                decoration: .new(
+                  suffixIcon: Icon(Icons.send),
+                  hintText: 'Type your comment...',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  prefixIcon: Icon(Icons.comment, color: Color(0xFF006680)),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 15),
+                ),
               ),
             ),
           ),
@@ -75,7 +98,6 @@ class PostDetailsScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildCommentItem(
     String name,

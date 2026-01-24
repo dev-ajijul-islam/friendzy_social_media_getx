@@ -3,7 +3,8 @@ import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 
 class CommentModel {
   String? commentId;
-  final UserModel author;
+  final UserModel postAuthor;
+  final UserModel commentAuthor;
   final String postId;
   final String comment;
   final List<String> likerIds;
@@ -11,7 +12,8 @@ class CommentModel {
 
   CommentModel({
     this.commentId,
-    required this.author,
+    required this.commentAuthor,
+    required this.postAuthor,
     required this.postId,
     required this.comment,
     required this.likerIds,
@@ -19,13 +21,14 @@ class CommentModel {
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
-    List<String> stringify(List<String> list) {
+    List<String> stringify(List<dynamic> list) {
       return list.map((e) => e.toString()).toList();
     }
 
     return CommentModel(
       commentId: json["commentId"],
-      author: json["author"],
+      commentAuthor: UserModel.fromJson(json["commentAuthor"]),
+      postAuthor: UserModel.fromJson(json["postAuthor"]),
       postId: json["postId"],
       comment: json["comment"],
       likerIds: stringify(json["likerIds"]),
@@ -35,7 +38,8 @@ class CommentModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "author": author.toJson(),
+      "postAuthor": postAuthor.toJson(),
+      "commentAuthor": commentAuthor.toJson(),
       "postId": postId,
       "comment": comment,
       "likerIds": likerIds,

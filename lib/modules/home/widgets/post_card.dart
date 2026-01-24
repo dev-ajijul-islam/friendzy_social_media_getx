@@ -199,7 +199,7 @@ class PostCard extends StatelessWidget {
 
   void _openFullScreenImage(List<String> images, int initialIndex) {
     Get.to(
-          () => FullImageScreen(),
+      () => FullImageScreen(),
       arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
@@ -252,7 +252,7 @@ class PostCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.grey[100]!.withAlpha(500),
+          color: Colors.grey[100],
           borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
@@ -291,8 +291,14 @@ class PostCard extends StatelessWidget {
               style: const TextStyle(fontSize: 13, height: 1.4),
             ),
             const SizedBox(height: 12),
-            _buildImageGrid(postModel),
-
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                side: .new(color: Colors.black),
+                borderRadius: .circular(10),
+              ),
+              child: _buildImageGrid(postModel),
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -332,7 +338,7 @@ class PostCard extends StatelessWidget {
                   style: TextStyle(fontSize: 10, color: Colors.grey[700]),
                 ),
                 const Spacer(),
-                LikeButton(post: postModel,),
+                LikeButton(post: postModel),
                 const SizedBox(width: 4),
                 Text(
                   postModel.likerIds!.length.toString(),
