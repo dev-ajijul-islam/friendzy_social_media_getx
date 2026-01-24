@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
 import 'package:friendzy_social_media_getx/widgets/like_button.dart';
@@ -9,20 +10,23 @@ class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.postModel});
   final PostModel postModel;
 
-  Widget _buildImageGrid() {
+  Widget _buildImageGrid(PostModel postModel) {
     final images = postModel.images ?? [];
     final imageCount = images.length;
 
-    if (imageCount == 0) return SizedBox();
+    if (imageCount == 0) return const SizedBox();
 
     if (imageCount == 1) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          images[0].toString(),
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 250,
+      return GestureDetector(
+        onTap: () => _openFullScreenImage(images, 0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network(
+            images[0],
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: 250,
+          ),
         ),
       );
     }
@@ -31,29 +35,27 @@ class PostCard extends StatelessWidget {
       return Row(
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[0].toString(),
-                fit: BoxFit.cover,
-                height: 200,
+            child: GestureDetector(
+              onTap: () => _openFullScreenImage(images, 0),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+                child: Image.network(images[0], fit: BoxFit.cover, height: 200),
               ),
             ),
           ),
           const SizedBox(width: 2),
           Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[1].toString(),
-                fit: BoxFit.cover,
-                height: 200,
+            child: GestureDetector(
+              onTap: () => _openFullScreenImage(images, 1),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                child: Image.network(images[1], fit: BoxFit.cover, height: 200),
               ),
             ),
           ),
@@ -64,43 +66,52 @@ class PostCard extends StatelessWidget {
     if (imageCount == 3) {
       return Column(
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-            ),
-            child: Image.network(
-              images[0].toString(),
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 150,
+          GestureDetector(
+            onTap: () => _openFullScreenImage(images, 0),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              child: Image.network(
+                images[0],
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 150,
+              ),
             ),
           ),
           const SizedBox(height: 2),
           Row(
             children: [
               Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(10),
-                  ),
-                  child: Image.network(
-                    images[1].toString(),
-                    fit: BoxFit.cover,
-                    height: 150,
+                child: GestureDetector(
+                  onTap: () => _openFullScreenImage(images, 1),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    child: Image.network(
+                      images[1],
+                      fit: BoxFit.cover,
+                      height: 150,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 2),
               Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(10),
-                  ),
-                  child: Image.network(
-                    images[2].toString(),
-                    fit: BoxFit.cover,
-                    height: 150,
+                child: GestureDetector(
+                  onTap: () => _openFullScreenImage(images, 2),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(10),
+                    ),
+                    child: Image.network(
+                      images[2],
+                      fit: BoxFit.cover,
+                      height: 150,
+                    ),
                   ),
                 ),
               ),
@@ -121,12 +132,15 @@ class PostCard extends StatelessWidget {
         ),
         itemCount: 4,
         itemBuilder: (context, index) {
-          return ClipRRect(
-            borderRadius: _getBorderRadius(index, 4),
-            child: Image.network(
-              images[index].toString(),
-              fit: BoxFit.cover,
-              height: 150,
+          return GestureDetector(
+            onTap: () => _openFullScreenImage(images, index),
+            child: ClipRRect(
+              borderRadius: _getBorderRadius(index, 4),
+              child: Image.network(
+                images[index],
+                fit: BoxFit.cover,
+                height: 150,
+              ),
             ),
           );
         },
@@ -145,28 +159,34 @@ class PostCard extends StatelessWidget {
           ),
           itemCount: 4,
           itemBuilder: (context, index) {
-            return ClipRRect(
-              borderRadius: _getBorderRadius(index, 4),
-              child: Image.network(
-                images[index].toString(),
-                fit: BoxFit.cover,
-                height: 150,
+            return GestureDetector(
+              onTap: () => _openFullScreenImage(images, index),
+              child: ClipRRect(
+                borderRadius: _getBorderRadius(index, 4),
+                child: Image.network(
+                  images[index],
+                  fit: BoxFit.cover,
+                  height: 150,
+                ),
               ),
             );
           },
         ),
         Positioned.fill(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              color: Colors.black.withAlpha(50),
-              child: Center(
-                child: Text(
-                  '+${imageCount - 4}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+          child: GestureDetector(
+            onTap: () => _openFullScreenImage(images, 0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                color: Colors.black.withAlpha(50),
+                child: Center(
+                  child: Text(
+                    '+${imageCount - 4}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -174,6 +194,13 @@ class PostCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _openFullScreenImage(List<String> images, int initialIndex) {
+    Get.to(
+          () => FullImageScreen(),
+      arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
 
@@ -264,7 +291,7 @@ class PostCard extends StatelessWidget {
               style: const TextStyle(fontSize: 13, height: 1.4),
             ),
             const SizedBox(height: 12),
-            _buildImageGrid(),
+            _buildImageGrid(postModel),
 
             const SizedBox(height: 12),
             Row(
