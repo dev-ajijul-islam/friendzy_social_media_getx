@@ -323,7 +323,7 @@ class PostCard extends StatelessWidget {
                         FirebaseServices.auth.currentUser?.uid,
                       )
                       ? "Liked by you ${(postModel.likerIds!.length - 1)}+ others"
-                      : 'Liked by ${postModel.likerIds!.length}+ users',
+                      : 'Liked by ${postModel.likerIds!.length} users',
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
               ],

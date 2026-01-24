@@ -21,6 +21,7 @@ class CommentModel {
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
+
     List<String> stringify(List<dynamic> list) {
       return list.map((e) => e.toString()).toList();
     }
@@ -34,6 +35,7 @@ class CommentModel {
       likerIds: stringify(json["likerIds"]),
       createdAt: (json["createdAt"] as Timestamp).toDate(),
     );
+
   }
 
   Map<String, dynamic> toJson() {

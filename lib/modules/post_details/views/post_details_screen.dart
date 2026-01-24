@@ -5,6 +5,7 @@ import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/create_comment_controller.dart';
+import 'package:friendzy_social_media_getx/modules/post_details/controllers/like_to_a_comment_controller.dart';
 import 'package:friendzy_social_media_getx/utils/get_time_ago.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
@@ -106,9 +107,11 @@ class PostDetailsScreen extends StatelessWidget {
                               snapshot.data!.docs.length,
                               (index) {
                                 final CommentModel comment =
-                                    CommentModel.fromJson(
-                                      snapshot.data!.docs[index].data(),
-                                    );
+                                    CommentModel.fromJson({
+                                      ...snapshot.data!.docs[index].data(),
+                                      "commentId":
+                                          snapshot.data?.docs[index].id,
+                                    });
 
                                 return _buildCommentItem(comment: comment);
                               },
@@ -188,6 +191,12 @@ class PostDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildCommentItem({required CommentModel comment}) {
+    final LikeToACommentController likeToACommentController =
+        Get.find<LikeToACommentController>();
+
+    final isMe = comment.likerIds.contains(
+      FirebaseServices.auth.currentUser!.uid,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
@@ -232,7 +241,18 @@ class PostDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.favorite, color: Colors.red, size: 14),
+                    IconButton(
+                      onPressed: () {
+                        likeToACommentController.toggleLikeToComment(
+                          comment: comment,
+                          isMe: isMe,
+                        );
+                      },
+                      icon: Icon(
+                        isMe ? Icons.favorite : Icons.favorite_outline,
+                        color: Colors.red,
+                      ),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       comment.likerIds.length.toString(),
