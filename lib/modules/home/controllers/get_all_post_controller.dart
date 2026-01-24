@@ -20,7 +20,10 @@ class GetAllPostController extends GetxController {
         .listen(
           (snapshot) {
             posts.value = snapshot.docs
-                .map((doc) => PostModel.fromJson(doc.data()))
+                .map(
+                  (doc) =>
+                      PostModel.fromJson({...doc.data(), "postId": doc.id}),
+                )
                 .toList();
             isLoading.value = false;
           },

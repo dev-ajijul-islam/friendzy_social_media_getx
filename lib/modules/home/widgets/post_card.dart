@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
+import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
+import 'package:friendzy_social_media_getx/widgets/like_button.dart';
 import 'package:get/get.dart';
 
 class PostCard extends StatelessWidget {
@@ -303,14 +305,14 @@ class PostCard extends StatelessWidget {
                   style: TextStyle(fontSize: 10, color: Colors.grey[700]),
                 ),
                 const Spacer(),
-                const Icon(Icons.favorite, color: Colors.red, size: 18),
+                LikeButton(post: postModel,),
                 const SizedBox(width: 4),
                 Text(
                   postModel.likerIds!.length.toString(),
                   style: TextStyle(fontSize: 12),
                 ),
                 const SizedBox(width: 15),
-                const Icon(Icons.chat_bubble, color: Colors.black, size: 18),
+                CommentButton(),
                 const SizedBox(width: 4),
                 Text(
                   postModel.commenterIds!.length.toString(),

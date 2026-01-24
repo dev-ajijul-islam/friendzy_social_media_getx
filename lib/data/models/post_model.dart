@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 
 class PostModel {
+  String? postId;
   UserModel author;
   String caption;
   List<String>? images;
@@ -11,6 +12,7 @@ class PostModel {
   DateTime createdAt;
 
   PostModel({
+    this.postId,
     required this.author,
     required this.caption,
     this.images,
@@ -26,6 +28,7 @@ class PostModel {
     }
 
     return PostModel(
+      postId: json["postId"],
       author: UserModel.fromJson(json["author"]),
       caption: json["caption"],
       commenterIds: stringify(json["commenterIds"]),

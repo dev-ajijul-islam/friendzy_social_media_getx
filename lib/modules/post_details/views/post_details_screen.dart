@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
+import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
+import 'package:friendzy_social_media_getx/widgets/like_button.dart';
 import 'package:get/get.dart';
 
 class PostDetailsScreen extends StatelessWidget {
@@ -38,11 +40,7 @@ class PostDetailsScreen extends StatelessWidget {
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10),
                 ),
-                child: Image.network(
-                  images[0],
-                  fit: BoxFit.cover,
-                  height: 200,
-                ),
+                child: Image.network(images[0], fit: BoxFit.cover, height: 200),
               ),
             ),
           ),
@@ -55,11 +53,7 @@ class PostDetailsScreen extends StatelessWidget {
                   topRight: Radius.circular(10),
                   bottomRight: Radius.circular(10),
                 ),
-                child: Image.network(
-                  images[1],
-                  fit: BoxFit.cover,
-                  height: 200,
-                ),
+                child: Image.network(images[1], fit: BoxFit.cover, height: 200),
               ),
             ),
           ),
@@ -206,13 +200,13 @@ class PostDetailsScreen extends StatelessWidget {
     if (total == 2) {
       return index == 0
           ? const BorderRadius.only(
-        topLeft: Radius.circular(10),
-        bottomLeft: Radius.circular(10),
-      )
+              topLeft: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+            )
           : const BorderRadius.only(
-        topRight: Radius.circular(10),
-        bottomRight: Radius.circular(10),
-      );
+              topRight: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            );
     }
     if (total == 3) {
       if (index == 0) {
@@ -242,11 +236,8 @@ class PostDetailsScreen extends StatelessWidget {
 
   void _openFullScreenImage(List<String> images, int initialIndex) {
     Get.to(
-          () => FullImageScreen(),
-      arguments: {
-        'images': images,
-        'initialIndex': initialIndex,
-      },
+      () => FullImageScreen(),
+      arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
 
@@ -356,10 +347,7 @@ class PostDetailsScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 12, height: 1.4),
           ),
           const SizedBox(height: 12),
-
-
           _buildImageGrid(postModel),
-
           const SizedBox(height: 12),
           Row(
             children: [
@@ -399,17 +387,19 @@ class PostDetailsScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 9, color: Colors.grey),
               ),
               const Spacer(),
-              const Icon(Icons.favorite, color: Colors.red, size: 16),
+              LikeButton(post: postModel,),
               const SizedBox(width: 4),
-               Text(postModel.likerIds!.length.toString(), style: TextStyle(fontSize: 11)),
-              const SizedBox(width: 12),
-              const Icon(
-                Icons.chat_bubble_outline,
-                color: Colors.black,
-                size: 16,
+              Text(
+                postModel.likerIds!.length.toString(),
+                style: TextStyle(fontSize: 11),
               ),
+              const SizedBox(width: 12),
+              CommentButton(),
               const SizedBox(width: 4),
-               Text(postModel.commenterIds!.length.toString(), style: TextStyle(fontSize: 11)),
+              Text(
+                postModel.commenterIds!.length.toString(),
+                style: TextStyle(fontSize: 11),
+              ),
             ],
           ),
         ],
@@ -418,12 +408,12 @@ class PostDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildCommentItem(
-      String name,
-      String comment,
-      String time,
-      String likes,
-      String img,
-      ) {
+    String name,
+    String comment,
+    String time,
+    String likes,
+    String img,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(

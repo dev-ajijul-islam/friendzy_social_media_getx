@@ -1,4 +1,5 @@
 import 'package:friendzy_social_media_getx/controllers/image_upload_controller.dart';
+import 'package:friendzy_social_media_getx/controllers/like_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_layout_controller.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
@@ -15,5 +16,6 @@ class MainLayoutBinding extends Bindings {
     Get.lazyPut(() => ImageUploadController());
     Get.lazyPut(() => GetAllPostController());
     Get.put( FullImageViewController());
+    Get.put( LikePostController());
   }
 }
