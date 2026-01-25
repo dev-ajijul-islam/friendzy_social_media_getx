@@ -10,7 +10,7 @@ class StoryController extends GetxController {
 
   Timer? _timer;
 
-  final storyDuration = const Duration(seconds: 5);
+  final storyDuration = const Duration(seconds: 10);
 
   @override
   void onInit() {
