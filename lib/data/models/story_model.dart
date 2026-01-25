@@ -5,11 +5,7 @@ class StoryModel {
   final UserModel author;
   final StoryItem story;
 
-  StoryModel({
-    required this.story,
-    required this.author,
-    this.storyId,
-  });
+  StoryModel({required this.story, required this.author, this.storyId});
 
   factory StoryModel.fromJson(Map<String, dynamic> json) {
     return StoryModel(
@@ -19,11 +15,8 @@ class StoryModel {
     );
   }
 
-  Map<String,dynamic> toJson(){
-    return {
-      "author" : author.toJson(),
-      "story" : story.toJson(),
-    };
+  Map<String, dynamic> toJson() {
+    return {"author": author.toJson(), "story": story.toJson()};
   }
 }
 

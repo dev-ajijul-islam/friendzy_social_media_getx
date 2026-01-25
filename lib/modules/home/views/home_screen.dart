@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
@@ -80,7 +81,6 @@ class HomeScreen extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: stories.length + 1,
           itemBuilder: (context, index) {
-            // Add Story Card
             if (index == 0) {
               return GestureDetector(
                 onTap: () => Get.toNamed(AppRoutes.addStoryScreen),
@@ -93,30 +93,35 @@ class HomeScreen extends StatelessWidget {
                         alignment: Alignment.bottomCenter,
                         children: [
                           Container(
+                            clipBehavior: .hardEdge,
                             width: 95,
                             height: 160,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.grey[300],
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.add_circle_outline,
-                                size: 40,
-                                color: Colors.black,
+                              image: DecorationImage(
+                                fit: .cover,
+                                image: NetworkImage(
+                                  FirebaseServices.auth.currentUser!.photoURL
+                                      .toString(),
+                                ),
                               ),
+                              border: Border.all(
+                                color: Get.theme.colorScheme.secondary,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          const Positioned(
+                          Positioned(
                             bottom: -15,
                             child: CircleAvatar(
                               radius: 20,
                               backgroundColor: Colors.white,
                               child: CircleAvatar(
                                 radius: 17,
-                                backgroundImage: NetworkImage(
-                                  "https://i.pravatar.cc/150?u=me",
+                                child: Center(
+                                  child: Icon(
+                                    Icons.add_circle_outline,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
