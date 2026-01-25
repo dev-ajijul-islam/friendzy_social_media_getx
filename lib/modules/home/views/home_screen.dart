@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
+import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 
@@ -12,6 +13,8 @@ class HomeScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final GetAllPostController postController =
         Get.find<GetAllPostController>();
+    final StoryController storyController = Get.put(StoryController());
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -22,7 +25,7 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            _buildStoriesSection(),
+            _buildStoriesSection(storyController),
 
             _buildFeedSection(colorScheme, postController),
           ],
@@ -31,13 +34,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // ---------------- TOP SEARCH ----------------
+
   Widget _buildTopSection(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: .spaceBetween,
-        crossAxisAlignment: .center,
-        spacing: 10,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Container(
@@ -58,7 +62,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-
           IconButton(
             onPressed: () {
               Get.toNamed(AppRoutes.notificationScreen);
@@ -74,109 +77,91 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStoriesSection() {
-    final List<Map<String, String>> stories = [
-      {'name': 'Abdul', 'image': '', 'isMe': 'true'},
-      {
-        'name': 'Chris',
-        'image': 'https://i.pravatar.cc/150?u=1',
-        'isLive': 'true',
-      },
-      {'name': 'General', 'image': 'https://i.pravatar.cc/150?u=2'},
-      {'name': 'Ojogbon', 'image': 'https://i.pravatar.cc/150?u=3'},
-    ];
+  // ---------------- STORIES (REAL DATA) ----------------
 
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-        padding: const EdgeInsets.only(left: 15),
-        scrollDirection: Axis.horizontal,
-        itemCount: stories.length,
-        itemBuilder: (context, index) {
-          final story = stories[index];
-          return GestureDetector(
-            onTap: () => Get.toNamed(AppRoutes.storyDetailsScreen),
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Column(
-                children: [
-                  Stack(
-                    clipBehavior: .none,
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Container(
-                        width: 95,
-                        height: 160,
-                        decoration: BoxDecoration(
-                          border: .all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200],
-                          image: story['image'] != ''
-                              ? DecorationImage(
-                                  image: NetworkImage(story['image']!),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
+  Widget _buildStoriesSection(StoryController controller) {
+    return Obx(() {
+      if (controller.storiesByUser.isEmpty) {
+        return const SizedBox();
+      }
+
+      return SizedBox(
+        height: 220,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(left: 15),
+          scrollDirection: Axis.horizontal,
+          itemCount: controller.storiesByUser.length,
+          itemBuilder: (context, index) {
+            final storyModel = controller.storiesByUser[index];
+            final author = storyModel.author;
+
+            return GestureDetector(
+              onTap: () {
+                // Set selected user
+                controller.currentUserIndex.value = index;
+                controller.currentStoryIndex.value = 0;
+
+                Get.toNamed(AppRoutes.storyDetailsScreen);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Column(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Container(
+                          width: 95,
+                          height: 160,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey[200],
+                            image: storyModel.stories.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(
+                                      storyModel.stories.first.image,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
                         ),
-                        child: story['isMe'] == 'true'
-                            ? const Center(
-                                child: Icon(Icons.add, color: Colors.black),
-                              )
-                            : null,
-                      ),
-                      if (story['isLive'] == 'true')
+
+                        // Avatar
                         Positioned(
-                          top: 5,
-                          right: 5,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black38,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: const Text(
-                              'LIVE',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                        ),
-                      Positioned(
-                        bottom: -15,
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.white,
+                          bottom: -15,
                           child: CircleAvatar(
-                            radius: 17,
-                            backgroundImage: NetworkImage(
-                              'https://i.pravatar.cc/150?u=9',
+                            radius: 20,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 17,
+                              backgroundImage: NetworkImage(author.fullName),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    story['name']!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 14),
+                    Text(
+                      author.fullName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    });
   }
+
+  // ---------------- FEED ----------------
 
   Widget _buildFeedSection(
     ColorScheme colorScheme,
@@ -184,10 +169,10 @@ class HomeScreen extends StatelessWidget {
   ) {
     return Obx(() {
       if (postController.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       }
       if (postController.posts.isEmpty) {
-        return Center(child: Text("There is no post yet"));
+        return const Center(child: Text("There is no post yet"));
       }
 
       return ListView.builder(
