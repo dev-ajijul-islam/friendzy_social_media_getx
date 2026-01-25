@@ -184,7 +184,7 @@ class MyProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height/2,
+                  height: MediaQuery.of(context).size.height / 2,
                   child: TabBarView(
                     children: [
                       GridView.builder(

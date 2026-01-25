@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/story_model.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
+import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
 class StoryDetailsScreen extends StatelessWidget {
@@ -16,6 +18,9 @@ class StoryDetailsScreen extends StatelessWidget {
         final user = controller.currentUser;
         final story = controller.currentStory;
 
+        final isMe = user?.story.reactors.any(
+          (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
+        );
         return GestureDetector(
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity != null) {
@@ -94,36 +99,10 @@ class StoryDetailsScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.remove_red_eye,
-                                color: Colors.white70,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                story.viewers.length.toString(),
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 15),
-                          IconButton(
-                            icon: const Icon(Icons.favorite, color: Colors.red),
-                            onPressed: controller.react,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white),
-                            onPressed: () => Get.back(),
-                          ),
                         ],
                       ),
                     ),
-
                     const Spacer(),
-
                     if (story.captions.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -187,6 +166,51 @@ class StoryDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+              Positioned(
+                top: 540,
+                right: 10,
+                child: Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.remove_red_eye,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      story.viewers.length.toString(),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(width: 15),
+                    IconButton(
+                      icon: controller.isReacting.value
+                          ? ButtonLoading()
+                          : Icon(
+                              isMe! ? Icons.favorite : Icons.favorite_outline,
+                              color: Colors.red,
+                            ),
+                      onPressed: () => controller.isReacting.value
+                          ? null
+                          : controller.react(isMe!),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      story.reactors.length.toString(),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 50,
+                right: 20,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Get.back(),
                 ),
               ),
             ],

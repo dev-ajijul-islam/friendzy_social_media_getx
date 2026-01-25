@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/story_model.dart';
@@ -10,14 +11,17 @@ class StoryController extends GetxController {
   final TextEditingController captionController = TextEditingController();
   final storiesByUser = <StoryModel>[].obs;
 
+  final User user = FirebaseServices.auth.currentUser!;
+
   RxBool isLoading = false.obs;
+  RxBool isReacting = false.obs;
 
   final RxInt currentUserIndex = 0.obs;
   final RxDouble progress = 0.0.obs;
   final RxList<String> selectedImages = <String>[].obs;
 
   Timer? _timer;
-  final storyDuration = const Duration(seconds: 10);
+  final storyDuration = const Duration(seconds: 15);
 
   @override
   void onInit() {
@@ -27,28 +31,31 @@ class StoryController extends GetxController {
 
   //-----------------GET ALL STORIES------------------
   void getAllStories() {
-    FirebaseServices.firestore.collectionGroup("stories").snapshots().listen(
-          (snapshot) {
-        storiesByUser.value = snapshot.docs
-            .map((doc) => StoryModel.fromJson(doc.data()))
-            .toList();
+    FirebaseServices.firestore.collectionGroup("stories").snapshots().listen((
+      snapshot,
+    ) {
+      storiesByUser.value = snapshot.docs
+          .map((doc) => StoryModel.fromJson({...doc.data(), "storyId": doc.id}))
+          .toList();
 
-        // Reset index if necessary
-        if (storiesByUser.isEmpty) {
-          currentUserIndex.value = 0;
-          _timer?.cancel();
-        } else {
-          startProgress();
-        }
-      },
-    );
+      // Reset index if necessary
+      if (storiesByUser.isEmpty) {
+        currentUserIndex.value = 0;
+        _timer?.cancel();
+      } else {
+        startProgress();
+      }
+    });
   }
 
   //------------------ CREATE STORY ------------------
   Future<void> createStory() async {
     if (selectedImages.isEmpty) {
-      Get.snackbar("No Images", "Please select at least one image for your story",
-          snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        "No Images",
+        "Please select at least one image for your story",
+        snackPosition: SnackPosition.TOP,
+      );
       return;
     }
 
@@ -76,15 +83,22 @@ class StoryController extends GetxController {
           .collection("stories")
           .add(storyData.toJson());
 
-      Get.snackbar("Success", "Story posted successfully",
-          snackPosition: SnackPosition.TOP,
-          colorText: Colors.white,
-          backgroundColor: Colors.green);
+      Get.snackbar(
+        "Success",
+        "Story posted successfully",
+        snackPosition: SnackPosition.TOP,
+        colorText: Colors.white,
+        backgroundColor: Colors.green,
+      );
 
       selectedImages.clear();
       captionController.clear();
     } on FirebaseException catch (e) {
-      Get.snackbar("Failed", e.message.toString(), snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        "Failed",
+        e.message.toString(),
+        snackPosition: SnackPosition.TOP,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -101,7 +115,6 @@ class StoryController extends GetxController {
     _timer?.cancel();
     progress.value = 0;
 
-    // Only start progress if there is a current story
     if (currentStory == null) return;
 
     _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
@@ -124,8 +137,6 @@ class StoryController extends GetxController {
     if (currentUserIndex.value < storiesByUser.length - 1) {
       currentUserIndex.value++;
       startProgress();
-    } else {
-      Get.back();
     }
   }
 
@@ -144,7 +155,13 @@ class StoryController extends GetxController {
   void _addViewer() {
     if (currentStory == null) return;
 
-    final me = UserModel(email: "ajijul@gmail.com", fullName: "Ajijul Islam");
+    final me = UserModel(
+      email: user.email.toString(),
+      fullName: user.displayName!,
+      uid: user.uid,
+      profilePic: user.photoURL,
+    );
+
     final viewers = currentStory!.viewers;
 
     if (!viewers.any((u) => u.email == me.email)) {
@@ -152,17 +169,40 @@ class StoryController extends GetxController {
     }
   }
 
-  void react() {
+  void react(bool isMe) {
     if (currentStory == null) return;
+    isReacting.value = true;
 
-    final me = UserModel(email: "x@gmail.com", fullName: 'My Account', profilePic: '');
-    final reactors = currentStory!.reactors;
+    final me = UserModel(
+      email: user.email!,
+      fullName: user.displayName!,
+      uid: user.uid,
+      profilePic: user.photoURL,
+    );
 
-    if (!reactors.any((u) => u.email == me.email)) {
-      reactors.add(me);
-      Get.snackbar('Reaction', 'You reacted to this story ❤️', snackPosition: SnackPosition.TOP);
-    } else {
-      Get.snackbar('Reaction', 'You already reacted to this story', snackPosition: SnackPosition.TOP);
+    try {
+      isMe
+          ? FirebaseServices.firestore
+                .collection("users")
+                .doc(me.uid)
+                .collection("stories")
+                .doc(currentUser!.storyId)
+                .update({
+                  "story.reactors": FieldValue.arrayRemove([me.toJson()]),
+                })
+          : FirebaseServices.firestore
+                .collection("users")
+                .doc(me.uid)
+                .collection("stories")
+                .doc(currentUser!.storyId)
+                .update({
+                  "story.reactors": FieldValue.arrayUnion([me.toJson()]),
+                });
+      Get.snackbar("Success", "Reacted to the story");
+    } on FirebaseException catch (e) {
+      Get.snackbar("Failed", e.message.toString());
+    } finally {
+      isReacting.value = false;
     }
   }
 
