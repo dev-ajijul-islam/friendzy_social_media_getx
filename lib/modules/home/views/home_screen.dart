@@ -18,6 +18,7 @@ class HomeScreen extends StatelessWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
+        clipBehavior: .none,
         child: Column(
           children: [
             const SizedBox(height: 30),

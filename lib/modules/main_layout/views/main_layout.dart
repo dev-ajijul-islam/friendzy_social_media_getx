@@ -1,58 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_layout_controller.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/views/upload_post_screen.dart';
 import 'package:get/get.dart';
 
 class MainLayout extends StatelessWidget {
   MainLayout({super.key});
 
-  final controller = Get.find<MainLayoutController>();
+  final MainLayoutController controller = Get.find<MainLayoutController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBody: true,
+
       body: Obx(() => controller.screens[controller.selectedIndex.value]),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
-          ),
+
+      // ---------------- FLOATING BUTTON ----------------
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
+
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF006680),
+        elevation: 6,
+        shape: const CircleBorder(),
+        onPressed: () {
+          Get.to(UploadPostScreen());
+        },
+        child: const Icon(
+          Icons.add_circle_outline,
+          size: 28,
+          color: Colors.white,
         ),
-        child: Obx(
-          () => BottomNavigationBar(
-            currentIndex: controller.selectedIndex.value,
-            onTap: (index) {
-              controller.selectedIndex.value = index;
-            },
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            selectedItemColor: ColorScheme.of(context).secondary,
-            unselectedItemColor: Colors.black87,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            iconSize: 28,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_filled),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.people_outline),
-                label: 'Friends',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add_box_outlined),
-                label: 'Add',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.chat_bubble_outline),
-                label: 'Chat',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                label: 'Profile',
-              ),
-            ],
+      ),
+
+      // ---------------- BOTTOM BAR ----------------
+      bottomNavigationBar: Obx(
+        () => BottomAppBar(
+          elevation: 10,
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 3,
+
+          child: SizedBox(
+            height: 65,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // ---------------- LEFT ----------------
+                Row(
+                  children: [
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () {
+                        controller.selectedIndex.value = 0;
+                      },
+                      icon: Icon(
+                        Icons.home_filled,
+                        color: controller.selectedIndex.value == 0
+                            ? Get.theme.colorScheme.secondary
+                            : Get.theme.colorScheme.primary,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      onPressed: () {
+                        controller.selectedIndex.value = 1;
+                      },
+                      icon: Icon(
+                        Icons.people_alt,
+                        color: controller.selectedIndex.value == 1
+                            ? Get.theme.colorScheme.secondary
+                            : Get.theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // ---------------- RIGHT ----------------
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        controller.selectedIndex.value = 2;
+                      },
+                      icon: Icon(
+                        Icons.chat,
+                        color: controller.selectedIndex.value == 2
+                            ? Get.theme.colorScheme.secondary
+                            : Get.theme.colorScheme.primary,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      onPressed: () {
+                        controller.selectedIndex.value = 3;
+                      },
+                      icon: Icon(
+                        Icons.person_3,
+                        color: controller.selectedIndex.value == 3
+                            ? Get.theme.colorScheme.secondary
+                            : Get.theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

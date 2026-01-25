@@ -11,7 +11,6 @@ class MainLayoutController extends GetxController {
   final List<Widget> screens = [
     const HomeScreen(),
     const FriendsScreen(),
-    const UploadPostScreen(),
     const ChatsScreen(),
     const MyProfileScreen()
   ];
