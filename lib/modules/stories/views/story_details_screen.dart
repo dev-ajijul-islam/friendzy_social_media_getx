@@ -21,6 +21,7 @@ class StoryDetailsScreen extends StatelessWidget {
         final isMe = user?.story.reactors.any(
           (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
         );
+
         return GestureDetector(
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity != null) {
@@ -33,10 +34,8 @@ class StoryDetailsScreen extends StatelessWidget {
           },
           child: Stack(
             children: [
-              // ---------------- STORY IMAGE ----------------
               Positioned.fill(child: _buildStoryImage(story!)),
 
-              // ---------------- TOP GRADIENT ----------------
               Positioned(
                 top: 0,
                 left: 0,
@@ -56,10 +55,29 @@ class StoryDetailsScreen extends StatelessWidget {
                 ),
               ),
 
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 220,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.85),
+                        Colors.black.withOpacity(0.4),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               SafeArea(
                 child: Column(
                   children: [
-                    // ---------------- PROGRESS BAR ----------------
                     Padding(
                       padding: const EdgeInsets.all(10),
                       child: Container(
@@ -81,7 +99,6 @@ class StoryDetailsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // ---------------- USER INFO ----------------
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Row(
@@ -102,7 +119,9 @@ class StoryDetailsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+
                     const Spacer(),
+
                     if (story.captions.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -118,9 +137,8 @@ class StoryDetailsScreen extends StatelessWidget {
                         ),
                       ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
 
-                    // ---------------- COMMENT BOX ----------------
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Container(
@@ -149,7 +167,6 @@ class StoryDetailsScreen extends StatelessWidget {
                 ),
               ),
 
-              // ---------------- TAP ZONES ----------------
               Positioned.fill(
                 child: Row(
                   children: [
@@ -168,8 +185,9 @@ class StoryDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
               Positioned(
-                top: 540,
+                bottom: 120,
                 right: 10,
                 child: Column(
                   children: [
@@ -180,12 +198,11 @@ class StoryDetailsScreen extends StatelessWidget {
                         color: Colors.white70,
                       ),
                     ),
-                    const SizedBox(width: 2),
                     Text(
                       story.viewers.length.toString(),
                       style: const TextStyle(color: Colors.white70),
                     ),
-                    const SizedBox(width: 15),
+                    const SizedBox(height: 15),
                     IconButton(
                       icon: controller.isReacting.value
                           ? ButtonLoading()
@@ -197,7 +214,6 @@ class StoryDetailsScreen extends StatelessWidget {
                           ? null
                           : controller.react(isMe!),
                     ),
-                    const SizedBox(width: 2),
                     Text(
                       story.reactors.length.toString(),
                       style: const TextStyle(color: Colors.white70),
@@ -205,6 +221,7 @@ class StoryDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
               Positioned(
                 top: 50,
                 right: 20,
@@ -220,11 +237,11 @@ class StoryDetailsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- STORY IMAGE BUILDER ----------------
   Widget _buildStoryImage(StoryItem story) {
     final images = story.images;
 
     if (images.isEmpty) return const SizedBox();
+
     if (images.length == 1) {
       return Image.network(
         images[0],
@@ -244,7 +261,6 @@ class StoryDetailsScreen extends StatelessWidget {
       );
     }
 
-    // For 3 or more images
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
