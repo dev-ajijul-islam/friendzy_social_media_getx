@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/data/models/story_model.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_posts_controller.dart';
+import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_stories_controllers.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
@@ -16,7 +18,8 @@ class MyProfileScreen extends StatelessWidget {
         Get.find<MyProfileController>();
     final GetMyPostsController myPostsController =
         Get.find<GetMyPostsController>();
-
+    final GetMyStoriesControllers myStoriesController =
+        Get.find<GetMyStoriesControllers>();
     final UserModel userInfo = profileController.userInfo.value;
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -65,7 +68,7 @@ class MyProfileScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 40,
                             backgroundImage: NetworkImage(
-                              userInfo!.profilePic != null
+                              userInfo.profilePic != null
                                   ? userInfo.profilePic.toString()
                                   : 'https://i.pravatar.cc/150?u=5',
                             ),
@@ -78,7 +81,7 @@ class MyProfileScreen extends StatelessWidget {
                                 Text(
                                   profileController.isProfileInfoLoading.value
                                       ? "--"
-                                      : userInfo!.fullName.toString(),
+                                      : userInfo.fullName.toString(),
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -87,7 +90,7 @@ class MyProfileScreen extends StatelessWidget {
                                 Text(
                                   profileController.isProfileInfoLoading.value
                                       ? "--"
-                                      : userInfo!.email.toString(),
+                                      : userInfo.email.toString(),
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 13,
@@ -202,7 +205,7 @@ class MyProfileScreen extends StatelessWidget {
                           }
 
                           if (myPostsController.myPosts.isEmpty) {
-                            return Center(child: Text("There is no post yet"));
+                            return Center(child: Text("There is no story yet"));
                           }
 
                           final PostModel post =
@@ -249,33 +252,32 @@ class MyProfileScreen extends StatelessWidget {
                               crossAxisCount: 3,
                               childAspectRatio: 1,
                             ),
-                        itemCount: myPostsController.myPosts.length,
+                        itemCount: myStoriesController.myStories.length,
                         itemBuilder: (context, index) {
-                          if (myPostsController.isLoading.value) {
+                          if (myStoriesController.isLoading.value) {
                             return Center(child: CircularProgressIndicator());
                           }
 
-                          if (myPostsController.myPosts.isEmpty) {
-                            return Center(child: Text("There is no post yet"));
+                          if (myStoriesController.myStories.isEmpty) {
+                            return Center(child: Text("There is no story yet"));
                           }
 
-                          final PostModel post =
-                              myPostsController.myPosts[index];
+                          final StoryModel story =
+                              myStoriesController.myStories[index];
 
                           return GestureDetector(
-                            onTap: () => Get.toNamed(
-                              AppRoutes.postDetailsScreen,
-                              arguments: post,
-                            ),
+                            onTap: () {
+                              Get.toNamed(AppRoutes.storyDetailsScreen);
+                            },
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: post.images!.isEmpty
+                              child: story.story.images.isEmpty
                                   ? Card(
                                       child: Center(
                                         child: Text(
-                                          post.caption.length > 15
-                                              ? "${post.caption.substring(0, 15)}.."
-                                              : post.caption,
+                                          story.story.captions.length > 15
+                                              ? "${story.story.captions.substring(0, 15)}.."
+                                              : story.story.captions,
                                           textAlign: .center,
                                         ),
                                       ),
@@ -283,7 +285,7 @@ class MyProfileScreen extends StatelessWidget {
                                   : Card(
                                       clipBehavior: .hardEdge,
                                       child: Image.network(
-                                        post.images!.first.toString(),
+                                        story.story.images.first.toString(),
                                         fit: BoxFit.cover,
                                       ),
                                     ),

@@ -3,6 +3,7 @@ import 'package:friendzy_social_media_getx/controllers/like_post_controller.dart
 import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_layout_controller.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_posts_controller.dart';
+import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_stories_controllers.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/full_image_view_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/like_to_a_comment_controller.dart';
@@ -20,6 +21,7 @@ class MainLayoutBinding extends Bindings {
     Get.put(ImageUploadController());
     Get.lazyPut(() => GetAllPostController());
     Get.put( GetMyPostsController());
+    Get.put( GetMyStoriesControllers());
     Get.put( FullImageViewController());
     Get.put( LikePostController());
     Get.put( LikeToACommentController());
