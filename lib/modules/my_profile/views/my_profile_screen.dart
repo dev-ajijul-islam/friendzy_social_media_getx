@@ -52,6 +52,7 @@ class MyProfileScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Obx(
             () => Column(
+              mainAxisSize: .min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header Section
@@ -183,7 +184,7 @@ class MyProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.height/2,
                   child: TabBarView(
                     children: [
                       GridView.builder(
