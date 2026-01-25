@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:get/get.dart';
 
-
 class StoryDetailsScreen extends StatelessWidget {
   StoryDetailsScreen({super.key});
 
@@ -13,8 +12,8 @@ class StoryDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Obx(() {
-        final user = controller.users[controller.currentUserIndex.value];
-        final story = user.stories[controller.currentStoryIndex.value];
+        final user = controller.currentUser; // StoryModel
+        final story = controller.currentStory; // StoryItem
 
         return GestureDetector(
           onHorizontalDragEnd: (details) {
@@ -81,11 +80,13 @@ class StoryDetailsScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: NetworkImage(user.userImage),
+                            backgroundImage: NetworkImage(
+                              user.author.profilePic.toString(),
+                            ),
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            user.userName,
+                            user.author.fullName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -103,7 +104,7 @@ class StoryDetailsScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                story.views.toString(),
+                                story.viewers.length.toString(),
                                 style: const TextStyle(color: Colors.white70),
                               ),
                             ],
@@ -126,6 +127,24 @@ class StoryDetailsScreen extends StatelessWidget {
                     ),
 
                     const Spacer(),
+
+                    // ---------------- CAPTION (OPTIONAL) ----------------
+                    if (story.captions.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            story.captions,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 10),
 
                     // ---------------- COMMENT BOX ----------------
                     Padding(

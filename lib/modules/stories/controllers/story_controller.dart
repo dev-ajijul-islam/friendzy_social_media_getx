@@ -1,9 +1,14 @@
+// StoryController updated to use StoryModel & StoryItem (Firebase/JSON ready)
+
 import 'dart:async';
 import 'package:friendzy_social_media_getx/data/models/story_model.dart';
+import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:get/get.dart';
 
 class StoryController extends GetxController {
-  final users = <StoryUser>[].obs;
+
+  final storiesByUser = <StoryModel>[].obs;
+
   final RxInt currentUserIndex = 0.obs;
   final RxInt currentStoryIndex = 0.obs;
   final RxDouble progress = 0.0.obs;
@@ -16,52 +21,80 @@ class StoryController extends GetxController {
   void onInit() {
     super.onInit();
 
-    users.addAll([
-      StoryUser(
-        userName: "Oyin Dolapo",
-        userImage: "https://i.pravatar.cc/150?u=5",
+    // ------------------ DUMMY DATA (MATCHES StoryModel) ------------------
+
+    storiesByUser.addAll([
+      StoryModel(
+        author: UserModel(
+          fullName: "Rakibul",
+          email: "r@gmil.com"
+        ),
         stories: [
           StoryItem(
-            id: "1",
+            storyId: '1',
             image:
-                "https://images.unsplash.com/photo-1513104890138-7c749659a591",
+            'https://images.unsplash.com/photo-1513104890138-7c749659a591',
+            captions: 'Pizza time 🍕',
+            viewers: [],
+            reactors: [],
           ),
           StoryItem(
-            id: "2",
+            storyId: '2',
             image:
-                "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38',
+            captions: 'Dinner vibes',
+            viewers: [],
+            reactors: [],
           ),
           StoryItem(
-            id: "3",
+            storyId: '3',
             image:
-                "https://images.unsplash.com/photo-1565958011703-44f9829ba187",
+            'https://images.unsplash.com/photo-1565958011703-44f9829ba187',
+            captions: 'Sweet cravings',
+            viewers: [],
+            reactors: [],
           ),
         ],
       ),
-      StoryUser(
-        userName: "Chris Martin",
-        userImage: "https://i.pravatar.cc/150?u=1",
+      StoryModel(
+        author: UserModel(
+          email: "c@gmail.com",
+          fullName: 'Chris Martin',
+          profilePic: 'https://i.pravatar.cc/150?u=1',
+        ),
         stories: [
           StoryItem(
-            id: "4",
+            storyId: '4',
             image:
-                "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
+            captions: 'Food tour',
+            viewers: [],
+            reactors: [],
           ),
           StoryItem(
-            id: "5",
+            storyId: '5',
             image:
-                "https://images.unsplash.com/photo-1521305916504-4a1121188589",
+            'https://images.unsplash.com/photo-1521305916504-4a1121188589',
+            captions: 'Late night snack',
+            viewers: [],
+            reactors: [],
           ),
         ],
       ),
-      StoryUser(
-        userName: "Alex Johnson",
-        userImage: "https://i.pravatar.cc/150?u=3",
+      StoryModel(
+        author: UserModel(
+          email: "u@gmail.com",
+          fullName: 'Alex Johnson',
+          profilePic: 'https://i.pravatar.cc/150?u=3',
+        ),
         stories: [
           StoryItem(
-            id: "6",
+            storyId: '6',
             image:
-                "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",
+            'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe',
+            captions: 'Healthy life 🥗',
+            viewers: [],
+            reactors: [],
           ),
         ],
       ),
@@ -69,6 +102,13 @@ class StoryController extends GetxController {
 
     startProgress();
   }
+
+  // ------------------ HELPERS ------------------
+
+  StoryModel get currentUser => storiesByUser[currentUserIndex.value];
+
+  StoryItem get currentStory =>
+      currentUser.stories[currentStoryIndex.value];
 
   // ------------------ PROGRESS HANDLER ------------------
 
@@ -90,11 +130,10 @@ class StoryController extends GetxController {
   void nextStory() {
     _timer?.cancel();
 
-    final user = users[currentUserIndex.value];
+    _addViewer();
 
-    user.stories[currentStoryIndex.value].views++;
-
-    if (currentStoryIndex.value < user.stories.length - 1) {
+    if (currentStoryIndex.value <
+        currentUser.stories.length - 1) {
       currentStoryIndex.value++;
     } else {
       nextUser();
@@ -120,7 +159,7 @@ class StoryController extends GetxController {
   // ------------------ USER NAVIGATION ------------------
 
   void nextUser() {
-    if (currentUserIndex.value < users.length - 1) {
+    if (currentUserIndex.value < storiesByUser.length - 1) {
       currentUserIndex.value++;
       currentStoryIndex.value = 0;
       startProgress();
@@ -137,12 +176,46 @@ class StoryController extends GetxController {
     }
   }
 
-  void react() {
-    Get.snackbar(
-      "Reaction",
-      "You reacted to this story ❤️",
-      snackPosition: SnackPosition.BOTTOM,
+  // ------------------ VIEW + REACT ------------------
+
+  void _addViewer() {
+    // Replace with logged-in user
+    final me = UserModel(
+      email: "ajijul@gmail.com",
+      fullName: "Ajijul Islam"
     );
+
+    final viewers = currentStory.viewers;
+
+    if (!viewers.any((u) => u.email == me.email)) {
+      viewers.add(me);
+    }
+  }
+
+  void react() {
+    final me = UserModel(
+      email: "x@gmail.com",
+      fullName: 'My Account',
+      profilePic: '',
+    );
+
+    final reactors = currentStory.reactors;
+
+    if (!reactors.any((u) => u.email == me.email)) {
+      reactors.add(me);
+
+      Get.snackbar(
+        'Reaction',
+        'You reacted to this story ❤️',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } else {
+      Get.snackbar(
+        'Reaction',
+        'You already reacted to this story',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   @override
@@ -151,3 +224,13 @@ class StoryController extends GetxController {
     super.onClose();
   }
 }
+
+/*
+WHAT CHANGED:
+
+- Uses StoryModel instead of StoryUser
+- Uses UserModel as author
+- Viewers & reactors stored as List<UserModel>
+- Getter: currentUser & currentStory for clean UI binding
+- Ready for Firebase (toJson / fromJson compatible)
+*/
