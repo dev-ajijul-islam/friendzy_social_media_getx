@@ -47,7 +47,10 @@ class AppPages {
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.editProfile, page: () => EditProfileScreen()),
     GetPage(name: AppRoutes.userProfile, page: () => UserProfileScreen()),
-    GetPage(name: AppRoutes.addStoryScreen, page: () => AddStoryScreen()),
+    GetPage(
+      name: AppRoutes.addStoryScreen,
+      page: () => AddStoryScreen(),
+    ),
     GetPage(
       name: AppRoutes.notificationScreen,
       page: () => NotificationScreen(),

@@ -6,16 +6,18 @@ import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/full_image_view_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/like_to_a_comment_controller.dart';
+import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/post_upload_controller.dart';
 import 'package:get/get.dart';
 
 class MainLayoutBinding extends Bindings {
   @override
   void dependencies() {
+    Get.put( StoryController());
     Get.lazyPut(() => MainLayoutController());
     Get.put(MyProfileController());
     Get.lazyPut(() => PostUploadController());
-    Get.lazyPut(() => ImageUploadController());
+    Get.put(ImageUploadController());
     Get.lazyPut(() => GetAllPostController());
     Get.put( GetMyPostsController());
     Get.put( FullImageViewController());

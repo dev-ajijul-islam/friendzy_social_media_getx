@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/story_model.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:get/get.dart';
 
@@ -12,17 +13,15 @@ class StoryDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Obx(() {
-        final user = controller.currentUser; // StoryModel
-        final story = controller.currentStory; // StoryItem
+        final user = controller.currentUser;
+        final story = controller.currentStory;
 
         return GestureDetector(
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity != null) {
               if (details.primaryVelocity! < 0) {
-                // Swipe Left → Next User
                 controller.nextUser();
               } else if (details.primaryVelocity! > 0) {
-                // Swipe Right → Previous User
                 controller.previousUser();
               }
             }
@@ -30,9 +29,7 @@ class StoryDetailsScreen extends StatelessWidget {
           child: Stack(
             children: [
               // ---------------- STORY IMAGE ----------------
-              Positioned.fill(
-                child: Image.network(story.image, fit: BoxFit.cover),
-              ),
+              Positioned.fill(child: _buildStoryImage(story!)),
 
               // ---------------- TOP GRADIENT ----------------
               Positioned(
@@ -57,20 +54,25 @@ class StoryDetailsScreen extends StatelessWidget {
               SafeArea(
                 child: Column(
                   children: [
-                    // ---------------- PROGRESS BARS ----------------
+                    // ---------------- PROGRESS BAR ----------------
                     Padding(
                       padding: const EdgeInsets.all(10),
-                      child: Row(
-                        children: List.generate(user.stories.length, (index) {
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 2,
-                              ),
-                              child: _progressBar(index),
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: controller.progress.value,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
                             ),
-                          );
-                        }),
+                          ),
+                        ),
                       ),
                     ),
 
@@ -81,7 +83,7 @@ class StoryDetailsScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
-                              user.author.profilePic.toString(),
+                              user!.author.profilePic.toString(),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -93,8 +95,6 @@ class StoryDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-
-                          // ----------- VIEW COUNT -----------
                           Row(
                             children: [
                               const Icon(
@@ -109,15 +109,11 @@ class StoryDetailsScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           const SizedBox(width: 15),
-
-                          // ----------- REACTION BUTTON -----------
                           IconButton(
                             icon: const Icon(Icons.favorite, color: Colors.red),
                             onPressed: controller.react,
                           ),
-
                           IconButton(
                             icon: const Icon(Icons.close, color: Colors.white),
                             onPressed: () => Get.back(),
@@ -128,7 +124,6 @@ class StoryDetailsScreen extends StatelessWidget {
 
                     const Spacer(),
 
-                    // ---------------- CAPTION (OPTIONAL) ----------------
                     if (story.captions.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -181,13 +176,13 @@ class StoryDetailsScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: controller.previousStory,
+                        onTap: controller.previousUser,
                         child: Container(color: Colors.transparent),
                       ),
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: controller.nextStory,
+                        onTap: controller.nextUser,
                         child: Container(color: Colors.transparent),
                       ),
                     ),
@@ -201,37 +196,42 @@ class StoryDetailsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- PROGRESS BAR WIDGET ----------------
+  // ---------------- STORY IMAGE BUILDER ----------------
+  Widget _buildStoryImage(StoryItem story) {
+    final images = story.images;
 
-  Widget _progressBar(int index) {
-    return Obx(() {
-      final controller = Get.find<StoryController>();
-
-      double value = 0;
-
-      if (index < controller.currentStoryIndex.value) {
-        value = 1;
-      } else if (index == controller.currentStoryIndex.value) {
-        value = controller.progress.value;
-      }
-
-      return Container(
-        height: 4,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: FractionallySizedBox(
-          alignment: Alignment.centerLeft,
-          widthFactor: value,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        ),
+    if (images.isEmpty) return const SizedBox();
+    if (images.length == 1) {
+      return Image.network(
+        images[0],
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
       );
-    });
+    }
+
+    if (images.length == 2) {
+      return Row(
+        children: images
+            .map(
+              (img) => Expanded(child: Image.network(img, fit: BoxFit.cover)),
+            )
+            .toList(),
+      );
+    }
+
+    // For 3 or more images
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 2,
+        crossAxisSpacing: 2,
+      ),
+      itemCount: images.length > 4 ? 4 : images.length,
+      itemBuilder: (context, index) {
+        return Image.network(images[index], fit: BoxFit.cover);
+      },
+    );
   }
 }

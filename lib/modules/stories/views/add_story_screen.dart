@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/controllers/image_upload_controller.dart';
+import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
+import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
 class AddStoryScreen extends StatefulWidget {
@@ -9,10 +12,9 @@ class AddStoryScreen extends StatefulWidget {
 }
 
 class _AddStoryScreenState extends State<AddStoryScreen> {
-  final TextEditingController captionController = TextEditingController();
-
-  // Mock selected images
-  final RxList<String> selectedImages = <String>[].obs;
+  final ImageUploadController imageUploadController =
+      Get.find<ImageUploadController>();
+  final StoryController storyController = Get.find<StoryController>();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               width: double.infinity,
               color: Colors.grey[900],
               child: Obx(() {
-                if (selectedImages.isEmpty) {
+                if (storyController.selectedImages.isEmpty) {
                   return const Center(
                     child: Icon(
                       Icons.image_outlined,
@@ -44,7 +46,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     ),
                   );
                 }
-                return _buildImagePreviewGrid(selectedImages);
+                return _buildImagePreviewGrid(storyController.selectedImages);
               }),
             ),
           ),
@@ -68,7 +70,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 ),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: captionController,
+                  controller: storyController.captionController,
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: "Write something about your story...",
@@ -81,51 +83,45 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _actionButton(
-                      icon: Icons.camera_alt,
-                      label: "Camera",
-                      onTap: () {
-                        // Mock adding an image
-                        selectedImages.add(
-                          "https://picsum.photos/seed/${selectedImages.length + 1}/400/400",
-                        );
-                      },
+                Align(
+                  child: GestureDetector(
+                    onTap: () => imageUploadController.isUploading.value
+                        ? null
+                        : imageUploadController.uploadImage(
+                            reason: Reason.story,
+                          ),
+                    child: CircleAvatar(
+                      backgroundColor: Get.theme.colorScheme.secondary,
+                      radius: 40,
+                      child: Icon(Icons.add_photo_alternate, size: 35),
                     ),
-                    const SizedBox(width: 20),
-                    _actionButton(
-                      icon: Icons.photo_library,
-                      label: "Gallery",
-                      onTap: () {
-                        // Mock adding an image
-                        selectedImages.add(
-                          "https://picsum.photos/seed/${selectedImages.length + 1}/400/400",
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF006680),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  child: Obx(
+                    () => ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF006680),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    onPressed: () => submitStory(context),
-                    child: const Text(
-                      "Post Story",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      onPressed: () => storyController.isLoading.value
+                          ? null
+                          : submitStory(),
+                      child: storyController.isLoading.value
+                          ? ButtonLoading()
+                          : Text(
+                              "Post Story",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -163,8 +159,12 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   }
 
   // ---------------- SUBMIT HANDLER ----------------
-  void submitStory(BuildContext context) {
-    if (captionController.text.trim().isEmpty) {
+  void submitStory() {
+    if (storyController.captionController.text.trim().isEmpty) {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        Get.back();
+      });
+
       Get.snackbar(
         "Missing Caption",
         "Please write a caption for your story",
@@ -173,15 +173,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       return;
     }
 
-    Get.snackbar(
-      "Story Posted",
-      "Your story has been submitted successfully",
-      snackPosition: SnackPosition.BOTTOM,
-    );
-
-    Future.delayed(const Duration(milliseconds: 800), () {
-      Get.back();
-    });
+    storyController.createStory();
   }
 
   // ---------------- IMAGE GRID PREVIEW ----------------

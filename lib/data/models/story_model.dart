@@ -1,47 +1,52 @@
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 
 class StoryModel {
+  final String? storyId;
   final UserModel author;
-  final List<StoryItem> stories;
+  final StoryItem story;
 
-  StoryModel({required this.stories, required this.author});
+  StoryModel({
+    required this.story,
+    required this.author,
+    this.storyId,
+  });
 
   factory StoryModel.fromJson(Map<String, dynamic> json) {
     return StoryModel(
       author: UserModel.fromJson(json['author']),
-      stories: (json['stories'] as List)
-          .map((e) => StoryItem.fromJson(e))
-          .toList(),
+      story: StoryItem.fromJson(json["story"]),
+      storyId: json["storyId"],
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String,dynamic> toJson(){
     return {
-      'author': author.toJson(),
-      'stories': stories.map((e) => e.toJson()).toList(),
+      "author" : author.toJson(),
+      "story" : story.toJson(),
     };
   }
 }
 
 class StoryItem {
-  final String storyId;
   final String captions;
-  final String image;
+  final List<String> images;
   final List<UserModel> viewers;
   final List<UserModel> reactors;
 
   StoryItem({
-    required this.image,
+    required this.images,
     required this.captions,
     required this.viewers,
     required this.reactors,
-    required this.storyId,
   });
 
   factory StoryItem.fromJson(Map<String, dynamic> json) {
+    List<String> stringify(List<dynamic> list) {
+      return list.map((e) => e.toString()).toList();
+    }
+
     return StoryItem(
-      storyId: json['storyId'] ?? '',
-      image: json['image'] ?? '',
+      images: stringify(json['images']),
       captions: json['captions'] ?? '',
       viewers: (json['viewers'] as List? ?? [])
           .map((e) => UserModel.fromJson(e))
@@ -54,8 +59,7 @@ class StoryItem {
 
   Map<String, dynamic> toJson() {
     return {
-      'storyId': storyId,
-      'image': image,
+      'images': images,
       'captions': captions,
       'viewers': viewers.map((e) => e.toJson()).toList(),
       'reactors': reactors.map((e) => e.toJson()).toList(),

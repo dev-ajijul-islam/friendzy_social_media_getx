@@ -20,13 +20,9 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 30),
-
             _buildTopSection(colorScheme),
-
             const SizedBox(height: 20),
-
             _buildStoriesSection(storyController),
-
             _buildFeedSection(colorScheme, postController),
           ],
         ),
@@ -35,13 +31,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   // ---------------- TOP SEARCH ----------------
-
   Widget _buildTopSection(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Container(
@@ -63,9 +56,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {
-              Get.toNamed(AppRoutes.notificationScreen);
-            },
+            onPressed: () => Get.toNamed(AppRoutes.notificationScreen),
             icon: const Icon(
               Icons.notifications_none_outlined,
               size: 28,
@@ -77,8 +68,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- STORIES (REAL DATA) ----------------
-
+  // ---------------- STORIES ----------------
   Widget _buildStoriesSection(StoryController controller) {
     return Obx(() {
       final stories = controller.storiesByUser;
@@ -90,12 +80,10 @@ class HomeScreen extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: stories.length + 1,
           itemBuilder: (context, index) {
-            // ---------------- ADD STORY CARD ----------------
+            // Add Story Card
             if (index == 0) {
               return GestureDetector(
-                onTap: () {
-                   Get.toNamed(AppRoutes.addStoryScreen);
-                },
+                onTap: () => Get.toNamed(AppRoutes.addStoryScreen),
                 child: Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: Column(
@@ -120,7 +108,6 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-
                           const Positioned(
                             bottom: -15,
                             child: CircleAvatar(
@@ -150,14 +137,14 @@ class HomeScreen extends StatelessWidget {
               );
             }
 
-            // ---------------- USER STORY CARD ----------------
+            // User Story Card
             final storyModel = stories[index - 1];
             final author = storyModel.author;
+            final storyItem = storyModel.story;
 
             return GestureDetector(
               onTap: () {
                 controller.currentUserIndex.value = index - 1;
-                controller.currentStoryIndex.value = 0;
                 Get.toNamed(AppRoutes.storyDetailsScreen);
               },
               child: Padding(
@@ -175,18 +162,14 @@ class HomeScreen extends StatelessWidget {
                             border: Border.all(color: Colors.black),
                             borderRadius: BorderRadius.circular(12),
                             color: Colors.grey[200],
-                            image: storyModel.stories.isNotEmpty
+                            image: storyItem.images.isNotEmpty
                                 ? DecorationImage(
-                                    image: NetworkImage(
-                                      storyModel.stories.first.image,
-                                    ),
+                                    image: NetworkImage(storyItem.images[0]),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
                         ),
-
-                        // Avatar
                         Positioned(
                           bottom: -15,
                           child: CircleAvatar(
@@ -221,7 +204,6 @@ class HomeScreen extends StatelessWidget {
   }
 
   // ---------------- FEED ----------------
-
   Widget _buildFeedSection(
     ColorScheme colorScheme,
     GetAllPostController postController,
