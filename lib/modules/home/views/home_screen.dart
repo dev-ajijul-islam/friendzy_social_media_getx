@@ -152,6 +152,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 controller.currentUserIndex.value = index - 1;
                 Get.toNamed(AppRoutes.storyDetailsScreen);
+                controller.addViewer();
               },
               child: Padding(
                 padding: const EdgeInsets.only(right: 10),

@@ -21,7 +21,7 @@ class StoryController extends GetxController {
   final RxList<String> selectedImages = <String>[].obs;
 
   Timer? _timer;
-  final storyDuration = const Duration(seconds: 15);
+  final storyDuration = const Duration(seconds: 20);
 
   @override
   void onInit() {
@@ -130,7 +130,7 @@ class StoryController extends GetxController {
   void nextUser() {
     _timer?.cancel();
 
-    _addViewer();
+    addViewer();
 
     if (storiesByUser.isEmpty) return;
 
@@ -143,6 +143,8 @@ class StoryController extends GetxController {
   void previousUser() {
     _timer?.cancel();
 
+    addViewer();
+
     if (storiesByUser.isEmpty) return;
 
     if (currentUserIndex.value > 0) {
@@ -152,7 +154,7 @@ class StoryController extends GetxController {
   }
 
   //------------------ VIEW + REACT ------------------
-  void _addViewer() {
+  void addViewer() {
     if (currentStory == null) return;
 
     final me = UserModel(
@@ -162,11 +164,15 @@ class StoryController extends GetxController {
       profilePic: user.photoURL,
     );
 
-    final viewers = currentStory!.viewers;
+    FirebaseServices.firestore
+        .collection("users")
+        .doc(currentUser?.author.uid)
+        .collection("stories")
+        .doc(currentUser!.storyId)
+        .update({
+      "story.viewers": FieldValue.arrayUnion([me.toJson()]),
+    });
 
-    if (!viewers.any((u) => u.email == me.email)) {
-      viewers.add(me);
-    }
   }
 
   void react(bool isMe) {
@@ -184,7 +190,7 @@ class StoryController extends GetxController {
       isMe
           ? FirebaseServices.firestore
                 .collection("users")
-                .doc(me.uid)
+                .doc(currentUser?.author.uid)
                 .collection("stories")
                 .doc(currentUser!.storyId)
                 .update({
@@ -192,13 +198,12 @@ class StoryController extends GetxController {
                 })
           : FirebaseServices.firestore
                 .collection("users")
-                .doc(me.uid)
+                .doc(currentUser?.author.uid)
                 .collection("stories")
                 .doc(currentUser!.storyId)
                 .update({
                   "story.reactors": FieldValue.arrayUnion([me.toJson()]),
                 });
-      Get.snackbar("Success", "Reacted to the story");
     } on FirebaseException catch (e) {
       Get.snackbar("Failed", e.message.toString());
     } finally {
