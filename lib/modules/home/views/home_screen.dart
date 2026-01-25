@@ -81,26 +81,83 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildStoriesSection(StoryController controller) {
     return Obx(() {
-      if (controller.storiesByUser.isEmpty) {
-        return const SizedBox();
-      }
+      final stories = controller.storiesByUser;
 
       return SizedBox(
         height: 220,
         child: ListView.builder(
           padding: const EdgeInsets.only(left: 15),
           scrollDirection: Axis.horizontal,
-          itemCount: controller.storiesByUser.length,
+          itemCount: stories.length + 1,
           itemBuilder: (context, index) {
-            final storyModel = controller.storiesByUser[index];
+            // ---------------- ADD STORY CARD ----------------
+            if (index == 0) {
+              return GestureDetector(
+                onTap: () {
+                   Get.toNamed(AppRoutes.addStoryScreen);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Column(
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          Container(
+                            width: 95,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[300],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.add_circle_outline,
+                                size: 40,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+
+                          const Positioned(
+                            bottom: -15,
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 17,
+                                backgroundImage: NetworkImage(
+                                  "https://i.pravatar.cc/150?u=me",
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      const Text(
+                        "Your Story",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            // ---------------- USER STORY CARD ----------------
+            final storyModel = stories[index - 1];
             final author = storyModel.author;
 
             return GestureDetector(
               onTap: () {
-                // Set selected user
-                controller.currentUserIndex.value = index;
+                controller.currentUserIndex.value = index - 1;
                 controller.currentStoryIndex.value = 0;
-
                 Get.toNamed(AppRoutes.storyDetailsScreen);
               },
               child: Padding(
@@ -137,7 +194,9 @@ class HomeScreen extends StatelessWidget {
                             backgroundColor: Colors.white,
                             child: CircleAvatar(
                               radius: 17,
-                              backgroundImage: NetworkImage(author.fullName),
+                              backgroundImage: NetworkImage(
+                                author.profilePic.toString(),
+                              ),
                             ),
                           ),
                         ),
