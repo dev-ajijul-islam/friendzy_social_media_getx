@@ -36,6 +36,7 @@ class MainLayout extends StatelessWidget {
       // ---------------- BOTTOM BAR ----------------
       bottomNavigationBar: Obx(
         () => BottomAppBar(
+          height: 60,
           elevation: 10,
           shape: const CircularNotchedRectangle(),
           notchMargin: 3,

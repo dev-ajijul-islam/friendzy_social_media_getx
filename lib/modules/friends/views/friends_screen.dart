@@ -9,7 +9,7 @@ class FriendsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final FriendsControllers friendsControllers =
-    Get.find<FriendsControllers>();
+        Get.find<FriendsControllers>();
 
     const Color primaryTeal = Color(0xFF006680);
 
@@ -21,8 +21,11 @@ class FriendsScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios,
-                color: Colors.black, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+              size: 20,
+            ),
             onPressed: () => Get.back(),
           ),
           title: const Text(
@@ -54,13 +57,16 @@ class FriendsScreen extends StatelessWidget {
   }
 
   // ---------------- TAB CONTENT ----------------
-  Widget _buildTab(BuildContext context,
-      FriendsControllers friendsControllers, Color primaryTeal) {
+  Widget _buildTab(
+    BuildContext context,
+    FriendsControllers friendsControllers,
+    Color primaryTeal,
+  ) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 10,),
+          SizedBox(height: 10),
           _searchBox(primaryTeal),
           _buildSectionHeader(
             "Friend Requests",
@@ -72,8 +78,7 @@ class FriendsScreen extends StatelessWidget {
             child: ListView.builder(
               itemCount: friendsControllers.allUsers.length,
               itemBuilder: (context, index) {
-                final UserModel user =
-                friendsControllers.allUsers[index];
+                final UserModel user = friendsControllers.allUsers[index];
                 return _buildRequestTile(
                   user.fullName,
                   "2 Mutual Friends",
@@ -119,8 +124,7 @@ class FriendsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(width: 8),
           Text(
@@ -157,8 +161,7 @@ class FriendsScreen extends StatelessWidget {
                 ),
                 Text(
                   sub,
-                  style:
-                  const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
                 const SizedBox(height: 8),
                 Row(
