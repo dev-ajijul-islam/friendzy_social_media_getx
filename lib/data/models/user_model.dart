@@ -50,7 +50,9 @@ class UserModel {
     username: json['username'],
     fullName: json['fullName'],
     email: json['email'],
-    profilePic: json['profilePic'],
+    profilePic:
+        json['profilePic'] ??
+        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
     bio: json['bio'],
     region: json['region'],
     gender: json['gender'],

@@ -1,34 +1,66 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:get/get.dart';
 
 class FriendsControllers extends GetxController {
-  RxBool isLoading = true.obs;
+  RxBool isLoading = false.obs;
+  RxBool isFollowingLoading = false.obs;
+  RxString loadingUserId = ''.obs;
+
   RxList<UserModel> allUsers = <UserModel>[].obs;
+  final TextEditingController searchController = TextEditingController();
+  RxList<UserModel> filteredUsers = <UserModel>[].obs;
 
   final auth = FirebaseServices.auth;
 
   @override
   void onInit() {
     getAllUsers();
+    searchController.addListener(_filterUsers);
     super.onInit();
   }
 
+
   void getAllUsers() async {
-    FirebaseServices.firestore.collection("users").snapshots().listen((
-      snapshot,
-    ) {
-      allUsers.value = snapshot.docs
-          .map((u) => UserModel.fromJson(u.data()))
-          .toList();
+    isLoading.value = true;
+    FirebaseServices.firestore
+        .collection("users")
+        .where('uid', isNotEqualTo: auth.currentUser!.uid)
+        .snapshots()
+        .listen((snapshot) {
+      allUsers.value =
+          snapshot.docs.map((u) => UserModel.fromJson(u.data())).toList();
+      filteredUsers.value = allUsers;
       isLoading.value = false;
     });
   }
 
-  Future<void> toggleFollow({required UserModel targetUser}) async {
-    isLoading.value = true;
+  void _filterUsers() {
+    final query = searchController.text.toLowerCase();
+    if (query.isEmpty) {
+      filteredUsers.value = allUsers;
+    } else {
+      filteredUsers.value = allUsers
+          .where((user) =>
+      user.fullName.toLowerCase().contains(query) ||
+          user.email.toLowerCase().contains(query))
+          .toList();
+    }
+  }
 
+  Stream<bool> isFollowingStream(String targetUserId) {
+    return FirebaseServices.firestore
+        .collection("users")
+        .doc(auth.currentUser!.uid)
+        .collection("following")
+        .doc(targetUserId)
+        .snapshots()
+        .map((doc) => doc.exists);
+  }
+
+  Future<void> toggleFollow({required UserModel targetUser}) async {
     final currentUser = UserModel(
       fullName: auth.currentUser!.displayName.toString(),
       email: auth.currentUser!.email.toString(),
@@ -47,6 +79,7 @@ class FriendsControllers extends GetxController {
       final batch = FirebaseServices.firestore.batch();
 
       if (followingDoc.exists) {
+        // Unfollow
         batch.delete(
           FirebaseServices.firestore
               .collection("users")
@@ -73,15 +106,20 @@ class FriendsControllers extends GetxController {
           {'followersCount': FieldValue.increment(-1)},
         );
 
+        await batch.commit();
         Get.snackbar("Success", "Unfollowed ${targetUser.fullName}");
       } else {
+        // Follow
         batch.set(
           FirebaseServices.firestore
               .collection("users")
               .doc(currentUser.uid)
               .collection("following")
               .doc(targetUser.uid),
-          {...targetUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
+          {
+            ...targetUser.toJson(),
+            'followedAt': FieldValue.serverTimestamp()
+          },
         );
 
         batch.set(
@@ -90,7 +128,10 @@ class FriendsControllers extends GetxController {
               .doc(targetUser.uid)
               .collection("followers")
               .doc(currentUser.uid),
-          {...currentUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
+          {
+            ...currentUser.toJson(),
+            'followedAt': FieldValue.serverTimestamp()
+          },
         );
 
         batch.update(
@@ -103,14 +144,11 @@ class FriendsControllers extends GetxController {
           {'followersCount': FieldValue.increment(1)},
         );
 
+        await batch.commit();
         Get.snackbar("Success", "Following ${targetUser.fullName}");
       }
-
-      await batch.commit();
     } on FirebaseException catch (e) {
       Get.snackbar("Failed", e.message.toString());
-    } finally {
-      isLoading.value = false;
     }
   }
 }
