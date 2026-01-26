@@ -26,26 +26,87 @@ class FriendsControllers extends GetxController {
     });
   }
 
-  Future<void> followUser({required UserModel toFollow}) async {
+  Future<void> toggleFollow({required UserModel targetUser}) async {
     isLoading.value = true;
-    final UserModel currentUser = UserModel(
+
+    final currentUser = UserModel(
       fullName: auth.currentUser!.displayName.toString(),
       email: auth.currentUser!.email.toString(),
       uid: auth.currentUser!.uid,
       profilePic: auth.currentUser!.photoURL.toString(),
     );
+
     try {
-      await FirebaseServices.firestore
+      final followingDoc = await FirebaseServices.firestore
           .collection("users")
           .doc(currentUser.uid)
           .collection("following")
-          .add(toFollow.toJson());
+          .doc(targetUser.uid)
+          .get();
 
-      await FirebaseServices.firestore
-          .collection("users")
-          .doc(toFollow.uid)
-          .collection("followers")
-          .add(currentUser.toJson());
+      final batch = FirebaseServices.firestore.batch();
+
+      if (followingDoc.exists) {
+        batch.delete(
+          FirebaseServices.firestore
+              .collection("users")
+              .doc(currentUser.uid)
+              .collection("following")
+              .doc(targetUser.uid),
+        );
+
+        batch.delete(
+          FirebaseServices.firestore
+              .collection("users")
+              .doc(targetUser.uid)
+              .collection("followers")
+              .doc(currentUser.uid),
+        );
+
+        batch.update(
+          FirebaseServices.firestore.collection("users").doc(currentUser.uid),
+          {'followingCount': FieldValue.increment(-1)},
+        );
+
+        batch.update(
+          FirebaseServices.firestore.collection("users").doc(targetUser.uid),
+          {'followersCount': FieldValue.increment(-1)},
+        );
+
+        Get.snackbar("Success", "Unfollowed ${targetUser.fullName}");
+      } else {
+        batch.set(
+          FirebaseServices.firestore
+              .collection("users")
+              .doc(currentUser.uid)
+              .collection("following")
+              .doc(targetUser.uid),
+          {...targetUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
+        );
+
+        batch.set(
+          FirebaseServices.firestore
+              .collection("users")
+              .doc(targetUser.uid)
+              .collection("followers")
+              .doc(currentUser.uid),
+          {...currentUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
+        );
+
+        batch.update(
+          FirebaseServices.firestore.collection("users").doc(currentUser.uid),
+          {'followingCount': FieldValue.increment(1)},
+        );
+
+        batch.update(
+          FirebaseServices.firestore.collection("users").doc(targetUser.uid),
+          {'followersCount': FieldValue.increment(1)},
+        );
+
+        Get.snackbar("Success", "Following ${targetUser.fullName}");
+      }
+
+      await batch.commit();
     } on FirebaseException catch (e) {
       Get.snackbar("Failed", e.message.toString());
     } finally {

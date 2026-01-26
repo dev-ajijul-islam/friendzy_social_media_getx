@@ -80,10 +80,8 @@ class FriendsScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final UserModel user = friendsControllers.allUsers[index];
                 return _buildRequestTile(
-                  user.fullName,
-                  "2 Mutual Friends",
-                  user.profilePic.toString(),
-                  primaryTeal,
+                  controller: friendsControllers,
+                  user: user,
                 );
               },
             ),
@@ -141,39 +139,56 @@ class FriendsScreen extends StatelessWidget {
   }
 
   // ---------------- REQUEST TILE ----------------
-  Widget _buildRequestTile(String name, String sub, String img, Color primary) {
+  Widget _buildRequestTile({
+    required UserModel user,
+    required FriendsControllers controller,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         children: [
-          CircleAvatar(radius: 30, backgroundImage: NetworkImage(img)),
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(user.profilePic.toString()),
+          ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  user.fullName,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
                 ),
                 Text(
-                  sub,
+                  "2 mutual following",
                   style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    _smallButton("Follow", primary, Colors.white),
-                    const SizedBox(width: 10),
-                    _smallButton(
-                      "View profile",
-                      const Color(0xFFF2F2F2),
-                      Colors.black87,
-                    ),
-                  ],
+                Obx(
+                  () => Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => controller.isLoading.value
+                            ? null
+                            : controller.toggleFollow(targetUser: user),
+                        child: _smallButton(
+                          (controller.isLoading.value) ? "Following.." : "Follow",
+                          Get.theme.colorScheme.secondary,
+                          Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _smallButton(
+                        "View profile",
+                        const Color(0xFFF2F2F2),
+                        Colors.black87,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
