@@ -173,13 +173,6 @@ class _UserTile extends StatelessWidget {
     return FutureBuilder<bool>(
       future: controller.hasConversationWith(user.uid!),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          );
-        }
 
         final hasConv = snapshot.data ?? false;
         return Container(

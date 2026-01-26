@@ -9,12 +9,8 @@ class ConversationScreen extends StatelessWidget {
   final String? conversationId;
   final UserModel? targetUser;
 
-  const ConversationScreen({
-    super.key,
-    this.conversationId,
-    this.targetUser,
-  }) : assert(conversationId != null || targetUser != null,
-  'Either conversationId or targetUser must be provided');
+  const ConversationScreen({super.key, this.conversationId, this.targetUser})
+    : assert(conversationId != null || targetUser != null);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +26,11 @@ class ConversationScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0.5,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+                size: 20,
+              ),
               onPressed: () => Get.back(),
             ),
             title: Obx(() {
@@ -38,7 +38,10 @@ class ConversationScreen extends StatelessWidget {
               if (otherUser == null) {
                 return const Text(
                   'Loading...',
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 );
               }
 
@@ -71,13 +74,14 @@ class ConversationScreen extends StatelessWidget {
 
                   final messages = controller.messages;
                   if (messages.isEmpty) {
-                    return const Center(
-                      child: Text('Start a conversation'),
-                    );
+                    return const Center(child: Text('Start a conversation'));
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
                     reverse: true,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
@@ -90,15 +94,20 @@ class ConversationScreen extends StatelessWidget {
 
               // Message Input
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 10,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(top: BorderSide(color: Colors.black12)),
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.add_photo_alternate,
-                          color: Theme.of(context).colorScheme.primary),
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       onPressed: controller.sendImageMessage,
                     ),
                     Expanded(
@@ -106,23 +115,30 @@ class ConversationScreen extends StatelessWidget {
                         controller: controller.messageController,
                         decoration: const InputDecoration(
                           hintText: 'Type a message...',
-                          hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
                           border: InputBorder.none,
                         ),
                         onSubmitted: (_) => controller.sendTextMessage(),
                       ),
                     ),
-                    Obx(() => IconButton(
-                      icon: Icon(
-                        controller.isSending ? Icons.circle : Icons.send_outlined,
-                        color: controller.isSending
-                            ? Colors.grey
-                            : Theme.of(context).colorScheme.primary,
+                    Obx(
+                      () => IconButton(
+                        icon: Icon(
+                          controller.isSending
+                              ? Icons.circle
+                              : Icons.send_outlined,
+                          color: controller.isSending
+                              ? Colors.grey
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                        onPressed: controller.isSending
+                            ? null
+                            : controller.sendTextMessage,
                       ),
-                      onPressed: controller.isSending
-                          ? null
-                          : controller.sendTextMessage,
-                    )),
+                    ),
                   ],
                 ),
               ),
@@ -148,32 +164,47 @@ class _MessageBubble extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isMe) ...[
             CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage(message.sender.profilePic ??
-                  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"),
+              backgroundImage: NetworkImage(
+                message.sender.profilePic ??
+                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+              ),
             ),
             const SizedBox(width: 8),
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isMe
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 // Text Message
                 if (message.content.type == MessageType.text)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: isMe ? colorScheme.primary : const Color(0xFFF0F0F0),
+                      color: isMe
+                          ? colorScheme.primary
+                          : const Color(0xFFF0F0F0),
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(18),
                         topRight: const Radius.circular(18),
-                        bottomLeft: isMe ? const Radius.circular(18) : const Radius.circular(4),
-                        bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(18),
+                        bottomLeft: isMe
+                            ? const Radius.circular(18)
+                            : const Radius.circular(4),
+                        bottomRight: isMe
+                            ? const Radius.circular(4)
+                            : const Radius.circular(18),
                       ),
                     ),
                     child: Text(
@@ -189,7 +220,11 @@ class _MessageBubble extends StatelessWidget {
                 if (message.content.type == MessageType.image)
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => FullImageScreen(imageUrl: message.content.imageUrl!));
+                      Get.to(
+                        () => FullImageScreen(
+                          imageUrl: message.content.imageUrl!,
+                        ),
+                      );
                     },
                     child: Container(
                       width: 200,
@@ -228,17 +263,18 @@ class _MessageBubble extends StatelessWidget {
                   children: [
                     Text(
                       _formatTime(message.timestamp),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                     if (isMe) ...[
                       const SizedBox(width: 6),
                       Icon(
-                        message.status == MessageStatus.read ? Icons.done_all : Icons.done,
+                        message.status == MessageStatus.read
+                            ? Icons.done_all
+                            : Icons.done,
                         size: 14,
-                        color: message.status == MessageStatus.read ? Colors.blue : Colors.grey,
+                        color: message.status == MessageStatus.read
+                            ? Colors.blue
+                            : Colors.grey,
                       ),
                     ],
                   ],
@@ -257,7 +293,6 @@ class _MessageBubble extends StatelessWidget {
     return '$hour:$minute';
   }
 }
-
 
 class FullImageScreen extends StatelessWidget {
   final String imageUrl;
@@ -278,10 +313,7 @@ class FullImageScreen extends StatelessWidget {
       ),
       body: Center(
         child: InteractiveViewer(
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.contain,
-          ),
+          child: Image.network(imageUrl, fit: BoxFit.contain),
         ),
       ),
     );

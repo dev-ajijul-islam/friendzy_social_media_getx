@@ -29,8 +29,6 @@ class ChatsController extends GetxController {
     searchController.addListener(_filterData);
   }
 
-
-
   // Tab Management
   void changeTab(int index) {
     _currentTab.value = index;
@@ -62,30 +60,35 @@ class ChatsController extends GetxController {
 
     FirebaseServices.firestore
         .collection("conversations")
-        .snapshots() // Remove the where clause
+        .snapshots()
         .listen((snapshot) {
-      // Filter conversations client-side
-      final conversations = snapshot.docs
-          .map((doc) {
-        final data = doc.data();
-        final participants = List<Map<String, dynamic>>.from(data['participants'] ?? []);
+          // Filter conversations client-side
+          final conversations =
+              snapshot.docs
+                  .map((doc) {
+                    final data = doc.data();
+                    final participants = List<Map<String, dynamic>>.from(
+                      data['participants'] ?? [],
+                    );
 
-        // Check if current user is in participants
-        bool hasCurrentUser = participants.any((p) => p['uid'] == currentUserId);
+                    // Check if current user is in participants
+                    bool hasCurrentUser = participants.any(
+                      (p) => p['uid'] == currentUserId,
+                    );
 
-        if (hasCurrentUser) {
-          return ConversationModel.fromJson(data);
-        }
-        return null;
-      })
-          .where((conv) => conv != null)
-          .cast<ConversationModel>()
-          .toList()
-        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+                    if (hasCurrentUser) {
+                      return ConversationModel.fromJson(data);
+                    }
+                    return null;
+                  })
+                  .where((conv) => conv != null)
+                  .cast<ConversationModel>()
+                  .toList()
+                ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-      _conversations.value = conversations;
-      _filteredConversations.value = conversations;
-    });
+          _conversations.value = conversations;
+          _filteredConversations.value = conversations;
+        });
   }
 
   // Search Filtering
@@ -133,19 +136,39 @@ class ChatsController extends GetxController {
 
   // Check if user has conversation
   Future<bool> hasConversationWith(String userId) async {
-
     final currentUserId = FirebaseServices.auth.currentUser!.uid;
-    final query = await FirebaseServices.firestore
-        .collection("conversations")
-        .where('participantIds', arrayContains: currentUserId)
-        .get();
 
-    return query.docs.any((doc) {
-      final participants = List<String>.from(
-        doc.data()['participantIds'] ?? [],
-      );
-      return participants.contains(userId) && participants.length == 2;
-    });
+    try {
+      final query = await FirebaseServices.firestore
+          .collection("conversations")
+          .get();
+
+      return query.docs.any((doc) {
+        final data = doc.data();
+        final participants = List<Map<String, dynamic>>.from(
+          data['participants'] ?? [],
+        );
+
+        // Check if both users are in participants
+        bool hasCurrentUser = false;
+        bool hasTargetUser = false;
+
+        for (final participant in participants) {
+          final participantUid = participant['uid'];
+          if (participantUid == currentUserId) {
+            hasCurrentUser = true;
+          }
+          if (participantUid == userId) {
+            hasTargetUser = true;
+          }
+        }
+
+        return hasCurrentUser && hasTargetUser && participants.length == 2;
+      });
+    } catch (e) {
+      print('Error checking conversation: $e');
+      return false;
+    }
   }
 
   // Get existing conversation ID with user

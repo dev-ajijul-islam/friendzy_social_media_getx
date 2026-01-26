@@ -25,9 +25,9 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withOpacity(0.3),
               blurRadius: 10,
-              offset: const Offset(0, 2),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -152,11 +152,11 @@ class PostCard extends StatelessWidget {
             if (likesCount > 0)
               Text(
                 isLiked
-                    ? "You${othersCount > 0 ? ' + $othersCount others' : ''}"
+                    ? "You${' + $othersCount others'}"
                     : '$likesCount likes',
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
-            if(likesCount<1)
+            if (likesCount < 1)
               Text(
                 "No likes here",
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
