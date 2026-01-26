@@ -12,189 +12,182 @@ class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.postModel});
   final PostModel postModel;
 
-  Widget _buildImageGrid(PostModel postModel) {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          Get.toNamed(AppRoutes.postDetailsScreen, arguments: postModel),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPostHeader(),
+            const SizedBox(height: 12),
+            _buildPostCaption(),
+            const SizedBox(height: 12),
+            _buildPostImages(),
+            const SizedBox(height: 12),
+            _buildPostActions(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostHeader() {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 20,
+          backgroundImage: NetworkImage(
+            postModel.author.profilePic?.isNotEmpty == true
+                ? postModel.author.profilePic!
+                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                postModel.author.fullName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+              Text(
+                getTimeAgo((postModel.createdAt)),
+                style: TextStyle(color: Colors.grey[500], fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.more_horiz, size: 20),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPostCaption() {
+    if (postModel.caption.isEmpty) return const SizedBox();
+
+    return Text(
+      postModel.caption,
+      style: const TextStyle(fontSize: 13, height: 1.5),
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildPostImages() {
     final images = postModel.images ?? [];
     final imageCount = images.length;
 
     if (imageCount == 0) return const SizedBox();
 
-    if (imageCount == 1) {
-      return GestureDetector(
-        onTap: () => _openFullScreenImage(images, 0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.network(
-            images[0],
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 250,
-          ),
-        ),
-      );
-    }
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: _buildImageGrid(images),
+      ),
+    );
+  }
 
-    if (imageCount == 2) {
-      return Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _openFullScreenImage(images, 0),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                ),
-                child: Image.network(images[0], fit: BoxFit.cover, height: 200),
-              ),
-            ),
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _openFullScreenImage(images, 1),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
-                child: Image.network(images[1], fit: BoxFit.cover, height: 200),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+  Widget _buildImageGrid(List<String> images) {
+    final imageCount = images.length;
 
-    if (imageCount == 3) {
-      return Column(
-        children: [
-          GestureDetector(
-            onTap: () => _openFullScreenImage(images, 0),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[0],
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 150,
-              ),
-            ),
-          ),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _openFullScreenImage(images, 1),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                    ),
-                    child: Image.network(
-                      images[1],
-                      fit: BoxFit.cover,
-                      height: 150,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _openFullScreenImage(images, 2),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(10),
-                    ),
-                    child: Image.network(
-                      images[2],
-                      fit: BoxFit.cover,
-                      height: 150,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
+    switch (imageCount) {
+      case 1:
+        return _SingleImage(
+          imageUrl: images[0],
+          onTap: () => _openFullScreenImage(images, 0),
+        );
+      case 2:
+        return _TwoImages(imageUrls: images);
+      case 3:
+        return _ThreeImages(imageUrls: images);
+      case 4:
+        return _FourImages(imageUrls: images);
+      default:
+        return _MultipleImages(imageUrls: images);
     }
+  }
 
-    if (imageCount == 4) {
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
-        ),
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () => _openFullScreenImage(images, index),
-            child: ClipRRect(
-              borderRadius: _getBorderRadius(index, 4),
-              child: Image.network(
-                images[index],
-                fit: BoxFit.cover,
-                height: 150,
-              ),
-            ),
-          );
-        },
-      );
-    }
+  Widget _buildPostActions() {
+    final likesCount = postModel.likerIds?.length ?? 0;
+    final commentsCount = postModel.commentsCount ?? 0;
+    final currentUserId = FirebaseServices.auth.currentUser?.uid;
+    final isLiked = postModel.likerIds?.contains(currentUserId) ?? false;
+    final othersCount = isLiked ? likesCount - 1 : likesCount;
 
-    return Stack(
+    return Column(
       children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 2,
-            mainAxisSpacing: 2,
-          ),
-          itemCount: 4,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () => _openFullScreenImage(images, index),
-              child: ClipRRect(
-                borderRadius: _getBorderRadius(index, 4),
-                child: Image.network(
-                  images[index],
-                  fit: BoxFit.cover,
-                  height: 150,
-                ),
+        Row(
+          children: [
+            LikeButton(post: postModel),
+            const SizedBox(width: 8),
+            CommentButton(postModel: postModel),
+            const Spacer(),
+            if (likesCount > 0)
+              Text(
+                isLiked
+                    ? "You${othersCount > 0 ? ' + $othersCount others' : ''}"
+                    : '$likesCount likes',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
-            );
-          },
+            if(likesCount<1)
+              Text(
+                "No likes here",
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+          ],
         ),
-        Positioned.fill(
-          child: GestureDetector(
-            onTap: () => _openFullScreenImage(images, 0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                color: Colors.black.withAlpha(50),
-                child: Center(
-                  child: Text(
-                    '+${imageCount - 4}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+        const SizedBox(height: 8),
+
+        commentsCount > 0
+            ? Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  'View all $commentsCount comments',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+            : Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  'No comments yet',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -205,137 +198,206 @@ class PostCard extends StatelessWidget {
       arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
+}
 
-  BorderRadius _getBorderRadius(int index, int total) {
-    if (total == 1) return BorderRadius.circular(10);
-    if (total == 2) {
-      return index == 0
-          ? const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            )
-          : const BorderRadius.only(
-              topRight: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            );
-    }
-    if (total == 3) {
-      if (index == 0) {
-        return const BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
-        );
-      } else if (index == 1) {
-        return const BorderRadius.only(bottomLeft: Radius.circular(10));
-      } else {
-        return const BorderRadius.only(bottomRight: Radius.circular(10));
-      }
-    }
-    if (total == 4) {
-      if (index == 0) {
-        return const BorderRadius.only(topLeft: Radius.circular(10));
-      } else if (index == 1) {
-        return const BorderRadius.only(topRight: Radius.circular(10));
-      } else if (index == 2) {
-        return const BorderRadius.only(bottomLeft: Radius.circular(10));
-      } else {
-        return const BorderRadius.only(bottomRight: Radius.circular(10));
-      }
-    }
-    return BorderRadius.circular(0);
-  }
+// Single Image
+class _SingleImage extends StatelessWidget {
+  final String imageUrl;
+  final VoidCallback onTap;
+
+  const _SingleImage({required this.imageUrl, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          Get.toNamed(AppRoutes.postDetailsScreen, arguments: postModel),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(15),
+      onTap: onTap,
+      child: Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: 250,
+      ),
+    );
+  }
+}
+
+// Two Images
+class _TwoImages extends StatelessWidget {
+  final List<String> imageUrls;
+
+  const _TwoImages({required this.imageUrls});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => Get.to(
+              () => FullImageScreen(),
+              arguments: {'images': imageUrls, 'initialIndex': 0},
+            ),
+            child: Image.network(imageUrls[0], fit: BoxFit.cover, height: 200),
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Container(width: 1, color: Colors.white),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => Get.to(
+              () => FullImageScreen(),
+              arguments: {'images': imageUrls, 'initialIndex': 1},
+            ),
+            child: Image.network(imageUrls[1], fit: BoxFit.cover, height: 200),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Three Images
+class _ThreeImages extends StatelessWidget {
+  final List<String> imageUrls;
+
+  const _ThreeImages({required this.imageUrls});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => Get.to(
+            () => FullImageScreen(),
+            arguments: {'images': imageUrls, 'initialIndex': 0},
+          ),
+          child: Image.network(
+            imageUrls[0],
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: 200,
+          ),
+        ),
+        Container(height: 1, color: Colors.white),
+        Row(
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                    postModel.author.profilePic.toString(),
-                  ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Get.to(
+                  () => FullImageScreen(),
+                  arguments: {'images': imageUrls, 'initialIndex': 1},
                 ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      postModel.author.fullName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      getTimeAgo((postModel.createdAt)),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
+                child: Image.network(
+                  imageUrls[1],
+                  fit: BoxFit.cover,
+                  height: 150,
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              postModel.caption,
-              style: const TextStyle(fontSize: 13, height: 1.4),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                side: .new(color: Colors.black),
-                borderRadius: .circular(10),
               ),
-              child: _buildImageGrid(postModel),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                LikeButton(post: postModel),
-                const SizedBox(width: 4),
-                Text(
-                  postModel.likerIds!.length.toString(),
-                  style: TextStyle(fontSize: 12),
+            Container(width: 1, color: Colors.white),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Get.to(
+                  () => FullImageScreen(),
+                  arguments: {'images': imageUrls, 'initialIndex': 2},
                 ),
-                const SizedBox(width: 15),
-                CommentButton(postModel: postModel),
-                const SizedBox(width: 4),
-                Text(
-                  postModel.commentsCount.toString(),
-                  style: TextStyle(fontSize: 12),
+                child: Image.network(
+                  imageUrls[2],
+                  fit: BoxFit.cover,
+                  height: 150,
                 ),
-                Spacer(),
-                Text(
-                  postModel.likerIds!.contains(
-                        FirebaseServices.auth.currentUser?.uid,
-                      )
-                      ? "Liked by you ${(postModel.likerIds!.length - 1)}+ others"
-                      : 'Liked by ${postModel.likerIds!.length} users',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'View all ${postModel.commentsCount.toString()} comments',
-              style: TextStyle(color: Colors.grey[500], fontSize: 11),
+              ),
             ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+// Four Images
+class _FourImages extends StatelessWidget {
+  final List<String> imageUrls;
+
+  const _FourImages({required this.imageUrls});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 1,
+        crossAxisSpacing: 1,
       ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () => Get.to(
+            () => FullImageScreen(),
+            arguments: {'images': imageUrls, 'initialIndex': index},
+          ),
+          child: Image.network(
+            imageUrls[index],
+            fit: BoxFit.cover,
+            height: 150,
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Multiple Images (5+)
+class _MultipleImages extends StatelessWidget {
+  final List<String> imageUrls;
+
+  const _MultipleImages({required this.imageUrls});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 1,
+        crossAxisSpacing: 1,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Stack(
+          children: [
+            GestureDetector(
+              onTap: () => Get.to(
+                () => FullImageScreen(),
+                arguments: {'images': imageUrls, 'initialIndex': index},
+              ),
+              child: Image.network(
+                imageUrls[index],
+                fit: BoxFit.cover,
+                height: 150,
+              ),
+            ),
+            if (index == 3 && imageUrls.length > 4)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(
+                    child: Text(
+                      '+${imageUrls.length - 4}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
