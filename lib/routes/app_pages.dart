@@ -1,10 +1,14 @@
 import 'package:friendzy_social_media_getx/bindings/auth_binding.dart';
+import 'package:friendzy_social_media_getx/bindings/chat_binding.dart';
 import 'package:friendzy_social_media_getx/bindings/comment_binding.dart';
 import 'package:friendzy_social_media_getx/bindings/main_layout_binding.dart';
 import 'package:friendzy_social_media_getx/bindings/welcome_binding.dart';
 import 'package:friendzy_social_media_getx/modules/auth/views/forgot_password_screen.dart';
 import 'package:friendzy_social_media_getx/modules/auth/views/sign_in_screen.dart';
 import 'package:friendzy_social_media_getx/modules/auth/views/sign_up_screen.dart';
+import 'package:friendzy_social_media_getx/modules/chats/controllers/conversations_controller.dart';
+import 'package:friendzy_social_media_getx/modules/chats/views/chats_screen.dart';
+import 'package:friendzy_social_media_getx/modules/chats/views/conversation_screen.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/views/main_layout.dart';
 import 'package:friendzy_social_media_getx/modules/splash/views/splash_screen.dart';
 import 'package:friendzy_social_media_getx/modules/stories/views/add_story_screen.dart';
@@ -18,7 +22,7 @@ import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class AppPages {
-  static final List<GetPage> routes = [
+  static final List<GetPage> routes = <GetPage<dynamic>>[
     GetPage(
       name: AppRoutes.welcomeScreen,
       page: () => WelcomeScreen(),
@@ -47,10 +51,7 @@ class AppPages {
     GetPage(name: AppRoutes.splashScreen, page: () => SplashScreen()),
     GetPage(name: AppRoutes.editProfile, page: () => EditProfileScreen()),
     GetPage(name: AppRoutes.userProfile, page: () => UserProfileScreen()),
-    GetPage(
-      name: AppRoutes.addStoryScreen,
-      page: () => AddStoryScreen(),
-    ),
+    GetPage(name: AppRoutes.addStoryScreen, page: () => AddStoryScreen()),
     GetPage(
       name: AppRoutes.notificationScreen,
       page: () => NotificationScreen(),
@@ -63,6 +64,24 @@ class AppPages {
     GetPage(
       name: AppRoutes.storyDetailsScreen,
       page: () => StoryDetailsScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.chatsScreen,
+      page: () => ChatsScreen(),
+      binding: ChatBindings(),
+    ),
+
+    GetPage(
+      name: AppRoutes.conversationScreen,
+      page: () => ConversationScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => ConversationController(
+            conversationId: Get.arguments?['conversationId'] ?? '',
+            targetUser: Get.arguments?['targetUser'],
+          ),
+        );
+      }),
     ),
   ];
 }

@@ -1,5 +1,6 @@
 import 'package:friendzy_social_media_getx/controllers/image_upload_controller.dart';
 import 'package:friendzy_social_media_getx/controllers/like_post_controller.dart';
+import 'package:friendzy_social_media_getx/modules/chats/controllers/chat_controller.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/followers_controllers.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/following_controllers.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/friends_controllers.dart';
@@ -30,6 +31,7 @@ class MainLayoutBinding extends Bindings {
     Get.put( FriendsControllers());
     Get.put( FollowersControllers());
     Get.put( FollowingControllers());
+    Get.put( ChatsController());
     Get.put( LikeToACommentController());
   }
 }

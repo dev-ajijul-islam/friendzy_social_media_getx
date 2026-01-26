@@ -23,6 +23,28 @@ class ConversationModel {
     this.isMuted = false,
   });
 
+  ConversationModel copyWith({
+    String? conversationId,
+    List<UserModel>? participants,
+    MessageModel? lastMessage,
+    Map<String, int>? unreadCounts,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isPinned,
+    bool? isMuted,
+  }) {
+    return ConversationModel(
+      conversationId: conversationId ?? this.conversationId,
+      participants: participants ?? this.participants,
+      lastMessage: lastMessage ?? this.lastMessage,
+      unreadCounts: unreadCounts ?? this.unreadCounts,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isPinned: isPinned ?? this.isPinned,
+      isMuted: isMuted ?? this.isMuted,
+    );
+  }
+
   UserModel get otherParticipant {
     final currentUserId = FirebaseServices.auth.currentUser!.uid;
     return participants.firstWhere((user) => user.uid != currentUserId);
