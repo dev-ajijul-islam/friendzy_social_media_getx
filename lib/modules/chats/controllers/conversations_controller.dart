@@ -121,7 +121,7 @@ class ConversationController extends GetxController {
         .collection("conversations")
         .doc(conversationId)
         .collection("messages")
-        .orderBy('timestamp', descending: false)
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .listen((snapshot) {
           _messages.value = snapshot.docs
