@@ -10,6 +10,7 @@ import 'package:friendzy_social_media_getx/modules/chats/controllers/conversatio
 import 'package:friendzy_social_media_getx/modules/chats/views/chats_screen.dart';
 import 'package:friendzy_social_media_getx/modules/chats/views/conversation_screen.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/views/main_layout.dart';
+import 'package:friendzy_social_media_getx/modules/search_post/views/serach_post_screen.dart';
 import 'package:friendzy_social_media_getx/modules/splash/views/splash_screen.dart';
 import 'package:friendzy_social_media_getx/modules/stories/views/add_story_screen.dart';
 import 'package:friendzy_social_media_getx/modules/stories/views/story_details_screen.dart';
@@ -83,5 +84,6 @@ class AppPages {
         );
       }),
     ),
+    GetPage(name: AppRoutes.searchPost, page: () => SearchPostScreen()),
   ];
 }

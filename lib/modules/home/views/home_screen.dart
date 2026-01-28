@@ -46,7 +46,11 @@ class HomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0xFF006680), width: 1),
               ),
-              child: const TextField(
+              child: TextField(
+                onTap: () {
+                  Get.toNamed(AppRoutes.searchPost);
+                },
+
                 decoration: InputDecoration(
                   hintText: 'Type something ......',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),

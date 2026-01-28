@@ -13,4 +13,5 @@ class AppRoutes {
   static String addStoryScreen = "/add_story-screen";
   static String chatsScreen = "/chat-screen";
   static String conversationScreen = "/conversation-screen";
+  static String searchPost = "/search-post-screen";
 }
