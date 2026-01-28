@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
-import 'package:friendzy_social_media_getx/modules/upload_post/controllers/post_upload_controller.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,8 +11,8 @@ import 'package:http/http.dart' as http;
 enum Reason { post, story, profile, message }
 
 class ImageUploadController extends GetxController {
-  final PostUploadController postUploadController =
-      Get.find<PostUploadController>();
+  final CreateOrUpdatePostController postUploadController =
+      Get.find<CreateOrUpdatePostController>();
   RxBool isUploading = false.obs;
 
   final StoryController storyController = Get.find<StoryController>();

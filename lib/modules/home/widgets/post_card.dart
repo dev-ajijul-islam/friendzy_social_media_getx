@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/views/create_or_upload_post_screen.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:friendzy_social_media_getx/utils/get_time_ago.dart';
+import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
 import 'package:friendzy_social_media_getx/widgets/like_button.dart';
 import 'package:get/get.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key, required this.postModel});
+  PostCard({super.key, required this.postModel});
   final PostModel postModel;
+
+  final CreateOrUpdatePostController createOrUpdatePostController =
+      Get.find<CreateOrUpdatePostController>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withAlpha(300),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -79,7 +85,48 @@ class PostCard extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.more_horiz, size: 20),
-          onPressed: () {},
+          onPressed: () {
+            Get.dialog(
+              AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: .circular(10)),
+                insetPadding: .zero,
+                titlePadding: .symmetric(vertical: 15, horizontal: 20),
+                title: Text("Take Action", style: Get.textTheme.titleMedium),
+                contentPadding: .only(bottom: 20, left: 20, right: 20),
+                content: Obx(
+                  () => Column(
+                    spacing: 10,
+                    mainAxisSize: .min,
+                    children: [
+                      ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: .circular(10),
+                        ),
+                        tileColor: Colors.grey[200],
+                        title: Text("Delete"),
+                        trailing: Icon(Icons.delete_outline, color: Colors.red),
+                      ),
+                      ListTile(
+                        onTap: () => Get.to(UploadPostScreen(isUpdate: true,existingPost: postModel,)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: .circular(10),
+                        ),
+
+                        tileColor: Colors.grey[200],
+                        title: Text("Edit"),
+                        trailing: createOrUpdatePostController.inProcess.value
+                            ? ButtonLoading()
+                            : Icon(
+                                Icons.edit_note_sharp,
+                                color: Get.theme.colorScheme.secondary,
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -382,7 +429,7 @@ class _MultipleImages extends StatelessWidget {
             if (index == 3 && imageUrls.length > 4)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withAlpha(500),
                   child: Center(
                     child: Text(
                       '+${imageUrls.length - 4}',

@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/controllers/image_upload_controller.dart';
-import 'package:friendzy_social_media_getx/modules/upload_post/controllers/post_upload_controller.dart';
+import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 
 class UploadPostScreen extends StatelessWidget {
-  const UploadPostScreen({super.key});
+  bool isUpdate;
+  PostModel? existingPost;
+  UploadPostScreen({super.key, required this.isUpdate, this.existingPost});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final PostUploadController controller = Get.find<PostUploadController>();
+    final CreateOrUpdatePostController controller =
+        Get.find<CreateOrUpdatePostController>();
     final ImageUploadController imageUploadController =
         Get.find<ImageUploadController>();
+
+    if (isUpdate) {
+      controller.captionController.text = existingPost!.caption;
+      controller.hashTags.assignAll(existingPost!.hashTags!);
+      controller.images.assignAll(existingPost!.images!);
+
+      print(existingPost!.toJson());
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -130,7 +142,7 @@ class UploadPostScreen extends StatelessWidget {
                       hint: "",
                       controller.hashTagController,
                       (value) {
-                        if (controller.hashtags.isEmpty) {
+                        if (controller.hashTags.isEmpty) {
                           return "Enter a Tags here..";
                         }
                         return null;
@@ -165,7 +177,7 @@ class UploadPostScreen extends StatelessWidget {
                         label: Row(
                           spacing: 5,
                           children: [
-                            Text(controller.hashtags[index]),
+                            Text(controller.hashTags[index]),
                             Icon(Icons.close, size: 14, color: Colors.grey),
                           ],
                         ),
@@ -176,7 +188,7 @@ class UploadPostScreen extends StatelessWidget {
                       ),
                     ),
                     separatorBuilder: (context, index) => SizedBox(width: 2),
-                    itemCount: controller.hashtags.length,
+                    itemCount: controller.hashTags.length,
                   ),
                 ),
               ),
@@ -195,13 +207,16 @@ class UploadPostScreen extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: controller.inProcess.value
+                    onPressed: () => controller.inProcess.value
                         ? null
-                        : controller.createPost,
+                        : controller.createOrUpdatePost(
+                            existingPost: existingPost,
+                            isUpdate: isUpdate,
+                          ),
                     child: controller.inProcess.value
                         ? ButtonLoading()
                         : Text(
-                            'Upload',
+                           isUpdate ? "Update" : 'Create',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

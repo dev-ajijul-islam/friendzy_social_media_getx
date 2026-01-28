@@ -31,7 +31,7 @@ class PostModel {
       postId: json["postId"],
       author: UserModel.fromJson(json["author"]),
       caption: json["caption"],
-      commentsCount:json["commentsCount"],
+      commentsCount: json["commentsCount"],
       hashTags: stringify(json["hashTags"]),
       likerIds: stringify(json["likerIds"]),
       images: stringify(json["images"]),

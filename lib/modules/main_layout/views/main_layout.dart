@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_layout_controller.dart';
-import 'package:friendzy_social_media_getx/modules/upload_post/views/upload_post_screen.dart';
+import 'package:friendzy_social_media_getx/modules/upload_post/views/create_or_upload_post_screen.dart';
 import 'package:get/get.dart';
 
 class MainLayout extends StatelessWidget {
@@ -24,7 +24,7 @@ class MainLayout extends StatelessWidget {
         elevation: 6,
         shape: const CircleBorder(),
         onPressed: () {
-          Get.to(UploadPostScreen());
+          Get.to(UploadPostScreen(isUpdate: false));
         },
         child: const Icon(
           Icons.add_circle_outline,
