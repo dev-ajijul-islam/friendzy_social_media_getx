@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/post_details/controllers/delete_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/views/full_image_screen.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/views/create_or_upload_post_screen.dart';
@@ -17,6 +18,8 @@ class PostCard extends StatelessWidget {
 
   final CreateOrUpdatePostController createOrUpdatePostController =
       Get.find<CreateOrUpdatePostController>();
+  final DeletePostController deletePostController =
+      Get.find<DeletePostController>();
 
   @override
   Widget build(BuildContext context) {
@@ -99,15 +102,25 @@ class PostCard extends StatelessWidget {
                     mainAxisSize: .min,
                     children: [
                       ListTile(
+                        onTap: () {
+                          deletePostController.deletePost(post: postModel);
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: .circular(10),
                         ),
                         tileColor: Colors.grey[200],
                         title: Text("Delete"),
-                        trailing: Icon(Icons.delete_outline, color: Colors.red),
+                        trailing: deletePostController.isDeleting.value
+                            ? ButtonLoading()
+                            : Icon(Icons.delete_outline, color: Colors.red),
                       ),
                       ListTile(
-                        onTap: () => Get.to(UploadPostScreen(isUpdate: true,existingPost: postModel,)),
+                        onTap: () => Get.to(
+                          UploadPostScreen(
+                            isUpdate: true,
+                            existingPost: postModel,
+                          ),
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: .circular(10),
                         ),

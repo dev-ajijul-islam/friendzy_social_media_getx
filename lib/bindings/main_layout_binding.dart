@@ -9,6 +9,7 @@ import 'package:friendzy_social_media_getx/modules/main_layout/controllers/main_
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_posts_controller.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my_stories_controllers.dart';
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
+import 'package:friendzy_social_media_getx/modules/post_details/controllers/delete_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/full_image_view_controller.dart';
 import 'package:friendzy_social_media_getx/modules/post_details/controllers/like_to_a_comment_controller.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
@@ -33,5 +34,6 @@ class MainLayoutBinding extends Bindings {
     Get.put( FollowingControllers());
     Get.put( ChatsController());
     Get.put( LikeToACommentController());
+    Get.put( DeletePostController());
   }
 }
