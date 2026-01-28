@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
@@ -385,7 +386,7 @@ class _UserTile extends StatelessWidget {
               ? null
               : () => controller.toggleFollow(targetUser: user),
           child: _SmallButton(
-            label: isProcessing ? '...' : (isFollowing ? 'Unfollow' : 'Follow'),
+            label: (isFollowing ? 'Unfollow' : 'Follow'),
             backgroundColor: isFollowing
                 ? Colors.grey[300]!
                 : Get.theme.colorScheme.secondary,
@@ -416,8 +417,20 @@ class _UserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: 30,
-      backgroundImage: NetworkImage(profilePic),
       backgroundColor: Colors.grey[200],
+      backgroundImage: null, // remove NetworkImage
+      child: ClipOval(
+        child: CachedNetworkImage(
+          imageUrl: profilePic,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          placeholder: (context, url) =>
+              const CircularProgressIndicator(strokeWidth: 2),
+          errorWidget: (context, url, error) =>
+              const Icon(Icons.person, size: 30, color: Colors.grey),
+        ),
+      ),
     );
   }
 }

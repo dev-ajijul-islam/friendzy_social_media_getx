@@ -106,10 +106,7 @@ class HomeScreen extends StatelessWidget {
                             width: 95,
                             height: 160,
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Get.theme.colorScheme.secondary,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             child: profileUrl == null || profileUrl.isEmpty
                                 ? Container(
@@ -198,8 +195,7 @@ class HomeScreen extends StatelessWidget {
                           width: 95,
                           height: 160,
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             color: Colors.grey[200],
                           ),
                           child: storyImage == null

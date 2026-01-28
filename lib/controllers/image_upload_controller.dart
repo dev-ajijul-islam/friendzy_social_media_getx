@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
@@ -16,6 +17,9 @@ class ImageUploadController extends GetxController {
   RxBool isUploading = false.obs;
 
   final StoryController storyController = Get.find<StoryController>();
+
+  final MyProfileController myProfileController =
+      Get.find<MyProfileController>();
 
   Future<void> uploadImage({required Reason reason}) async {
     ImagePicker imagePicker = .new();
@@ -33,6 +37,7 @@ class ImageUploadController extends GetxController {
           uploadUrl,
           body: {"image": base64Encode(await imageBytes)},
         );
+
         final decoded = jsonDecode(response.body);
         if (reason == Reason.post) {
           postUploadController.images.add(decoded["data"]["url"]);
@@ -40,6 +45,21 @@ class ImageUploadController extends GetxController {
 
         if (reason == Reason.story) {
           storyController.selectedImages.add(decoded["data"]["url"]);
+        }
+        if (reason == Reason.profile) {
+          final bool isSuccess = await myProfileController.updateProfilePicture(
+            decoded["data"]["url"],
+          );
+
+          if (isSuccess) {
+            Get.back();
+            Get.snackbar(
+              'Success',
+              'Profile picture updated',
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+            );
+          }
         }
         Get.back();
         Get.snackbar(
@@ -56,6 +76,8 @@ class ImageUploadController extends GetxController {
     }
 
     Get.bottomSheet(
+      enableDrag: isUploading.value ? false : true,
+      isDismissible: isUploading.value ? false : true,
       Container(
         padding: .all(20),
         decoration: BoxDecoration(

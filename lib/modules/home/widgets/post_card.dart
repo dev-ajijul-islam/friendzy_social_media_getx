@@ -18,9 +18,9 @@ class PostCard extends StatelessWidget {
   final PostModel postModel;
 
   final CreateOrUpdatePostController createOrUpdatePostController =
-  Get.find<CreateOrUpdatePostController>();
+      Get.find<CreateOrUpdatePostController>();
   final DeletePostController deletePostController =
-  Get.find<DeletePostController>();
+      Get.find<DeletePostController>();
 
   @override
   Widget build(BuildContext context) {
@@ -65,101 +65,110 @@ class PostCard extends StatelessWidget {
         ? postModel.author.profilePic!
         : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: CachedNetworkImageProvider(profileUrl),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                postModel.author.fullName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              Text(
-                getTimeAgo((postModel.createdAt)),
-                style: TextStyle(color: Colors.grey[500], fontSize: 11),
-              ),
-            ],
+    return InkWell(
+      onTap: () =>
+          Get.toNamed(AppRoutes.userProfile, arguments: postModel.author),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: CachedNetworkImageProvider(profileUrl),
           ),
-        ),
-        isMe
-            ? IconButton(
-          icon: const Icon(Icons.more_horiz, size: 20),
-          onPressed: () {
-            Get.dialog(
-              AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                insetPadding: EdgeInsets.zero,
-                titlePadding:
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                title: Text(
-                  "Take Action",
-                  style: Get.textTheme.titleMedium,
-                ),
-                contentPadding:
-                const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-                content: Obx(
-                      () => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        onTap: () {
-                          deletePostController.deletePost(
-                            post: postModel,
-                          );
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        tileColor: Colors.grey[200],
-                        title: const Text("Delete"),
-                        trailing: deletePostController.isDeleting.value
-                            ? ButtonLoading()
-                            : const Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () => Get.to(
-                          UploadPostScreen(
-                            isUpdate: true,
-                            existingPost: postModel,
-                          ),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        tileColor: Colors.grey[200],
-                        title: const Text("Edit"),
-                        trailing:
-                        createOrUpdatePostController.inProcess.value
-                            ? ButtonLoading()
-                            : Icon(
-                          Icons.edit_note_sharp,
-                          color:
-                          Get.theme.colorScheme.secondary,
-                        ),
-                      ),
-                    ],
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  postModel.author.fullName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
                   ),
                 ),
-              ),
-            );
-          },
-        )
-            : const SizedBox(),
-      ],
+                Text(
+                  getTimeAgo((postModel.createdAt)),
+                  style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          isMe
+              ? IconButton(
+                  icon: const Icon(Icons.more_horiz, size: 20),
+                  onPressed: () {
+                    Get.dialog(
+                      AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        insetPadding: EdgeInsets.zero,
+                        titlePadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 20,
+                        ),
+                        title: Text(
+                          "Take Action",
+                          style: Get.textTheme.titleMedium,
+                        ),
+                        contentPadding: const EdgeInsets.only(
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                        ),
+                        content: Obx(
+                          () => Column(
+                            spacing: 10,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                onTap: () {
+                                  deletePostController.deletePost(
+                                    post: postModel,
+                                  );
+                                },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                tileColor: Colors.grey[200],
+                                title: const Text("Delete"),
+                                trailing: deletePostController.isDeleting.value
+                                    ? ButtonLoading()
+                                    : const Icon(
+                                        Icons.delete_outline,
+                                        color: Colors.red,
+                                      ),
+                              ),
+                              ListTile(
+                                onTap: () => Get.to(
+                                  UploadPostScreen(
+                                    isUpdate: true,
+                                    existingPost: postModel,
+                                  ),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                tileColor: Colors.grey[200],
+                                title: const Text("Edit"),
+                                trailing:
+                                    createOrUpdatePostController.inProcess.value
+                                    ? ButtonLoading()
+                                    : Icon(
+                                        Icons.edit_note_sharp,
+                                        color: Get.theme.colorScheme.secondary,
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : const SizedBox(),
+        ],
+      ),
     );
   }
 
@@ -257,14 +266,18 @@ class PostCard extends StatelessWidget {
 
   void _openFullScreenImage(List<String> images, int initialIndex) {
     Get.to(
-          () => FullImageScreen(),
+      () => FullImageScreen(),
       arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
 }
 
-Widget _cachedImage(String url,
-    {double? height, double? width, BoxFit fit = BoxFit.cover}) {
+Widget _cachedImage(
+  String url, {
+  double? height,
+  double? width,
+  BoxFit fit = BoxFit.cover,
+}) {
   return CachedNetworkImage(
     imageUrl: url,
     height: height,
@@ -292,8 +305,7 @@ class _SingleImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: _cachedImage(imageUrl,
-          height: 250, width: double.infinity),
+      child: _cachedImage(imageUrl, height: 250, width: double.infinity),
     );
   }
 }
@@ -310,7 +322,7 @@ class _TwoImages extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: () => Get.to(
-                  () => FullImageScreen(),
+              () => FullImageScreen(),
               arguments: {'images': imageUrls, 'initialIndex': 0},
             ),
             child: _cachedImage(imageUrls[0], height: 200),
@@ -320,7 +332,7 @@ class _TwoImages extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: () => Get.to(
-                  () => FullImageScreen(),
+              () => FullImageScreen(),
               arguments: {'images': imageUrls, 'initialIndex': 1},
             ),
             child: _cachedImage(imageUrls[1], height: 200),
@@ -342,11 +354,14 @@ class _ThreeImages extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () => Get.to(
-                () => FullImageScreen(),
+            () => FullImageScreen(),
             arguments: {'images': imageUrls, 'initialIndex': 0},
           ),
-          child: _cachedImage(imageUrls[0],
-              height: 200, width: double.infinity),
+          child: _cachedImage(
+            imageUrls[0],
+            height: 200,
+            width: double.infinity,
+          ),
         ),
         Container(height: 1, color: Colors.white),
         Row(
@@ -354,7 +369,7 @@ class _ThreeImages extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => Get.to(
-                      () => FullImageScreen(),
+                  () => FullImageScreen(),
                   arguments: {'images': imageUrls, 'initialIndex': 1},
                 ),
                 child: _cachedImage(imageUrls[1], height: 150),
@@ -364,7 +379,7 @@ class _ThreeImages extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => Get.to(
-                      () => FullImageScreen(),
+                  () => FullImageScreen(),
                   arguments: {'images': imageUrls, 'initialIndex': 2},
                 ),
                 child: _cachedImage(imageUrls[2], height: 150),
@@ -396,7 +411,7 @@ class _FourImages extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => Get.to(
-                () => FullImageScreen(),
+            () => FullImageScreen(),
             arguments: {'images': imageUrls, 'initialIndex': index},
           ),
           child: _cachedImage(imageUrls[index], height: 150),
@@ -427,7 +442,7 @@ class _MultipleImages extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () => Get.to(
-                    () => FullImageScreen(),
+                () => FullImageScreen(),
                 arguments: {'images': imageUrls, 'initialIndex': index},
               ),
               child: _cachedImage(imageUrls[index], height: 150),

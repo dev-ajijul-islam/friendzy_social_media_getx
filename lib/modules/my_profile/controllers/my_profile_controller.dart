@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:get/get.dart';
 
 class MyProfileController extends GetxController {
-  // Existing code - don't change
   Rx<UserModel> userInfo = UserModel(fullName: '--', email: '--').obs;
   RxBool isProfileInfoLoading = true.obs;
-  final user = FirebaseServices.auth.currentUser;
 
-  // New code for Edit Profile
+  final UserModel user = UserModel(
+    fullName: FirebaseServices.auth.currentUser!.displayName.toString(),
+    email: FirebaseServices.auth.currentUser!.email.toString(),
+    uid: FirebaseServices.auth.currentUser!.uid.toString(),
+  );
+
   final TextEditingController usernameController = TextEditingController();
-  final TextEditingController fullNameController =
-      TextEditingController(); // Added
+  final TextEditingController fullNameController = TextEditingController();
   final TextEditingController regionController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
@@ -21,6 +23,12 @@ class MyProfileController extends GetxController {
 
   RxBool isUpdating = false.obs;
   RxMap<String, dynamic> updatedFields = <String, dynamic>{}.obs;
+  final List<String> genderOptions = [
+    'Male',
+    'Female',
+    'Other',
+    'Prefer not to say',
+  ];
 
   @override
   void onInit() {
@@ -28,13 +36,13 @@ class MyProfileController extends GetxController {
     super.onInit();
   }
 
-  Future<void> getProfileInfo() async {
+  void getProfileInfo() async {
     FirebaseServices.firestore
         .collection("users")
-        .doc(user?.uid)
+        .doc(user.uid)
         .snapshots()
         .listen(
-          (snapshot) {
+          (snapshot) async {
             userInfo.value = UserModel.fromJson(snapshot.data()!);
             isProfileInfoLoading.value = false;
             _populateFormFields();
@@ -45,25 +53,20 @@ class MyProfileController extends GetxController {
         );
   }
 
-  // New method: Populate form fields with current user data
   void _populateFormFields() {
     final user = userInfo.value;
-
     usernameController.text = user.username ?? '';
-    fullNameController.text = user.fullName; // Added
+    fullNameController.text = user.fullName;
     regionController.text = user.region ?? '';
-    phoneNumberController.text =
-        user.phoneNumber ?? ''; // Assuming phoneNumber exists in model
+    phoneNumberController.text = user.phoneNumber ?? '';
     genderController.text = user.gender ?? '';
     bioController.text = user.bio ?? '';
   }
 
-  // New method: Update a specific field
   void updateField(String fieldName, dynamic value) {
     updatedFields[fieldName] = value;
   }
 
-  // New method: Save profile to both Firebase Auth and Firestore
   Future<bool> saveProfile() async {
     isUpdating.value = true;
 
@@ -74,12 +77,11 @@ class MyProfileController extends GetxController {
         return false;
       }
 
-      // Prepare updated data - now includes fullName
       final updatedData = <String, dynamic>{
         'username': usernameController.text.trim().isEmpty
             ? null
             : usernameController.text.trim(),
-        'fullName': fullNameController.text.trim(), // Added
+        'fullName': fullNameController.text.trim(),
         'region': regionController.text.trim().isEmpty
             ? null
             : regionController.text.trim(),
@@ -95,36 +97,29 @@ class MyProfileController extends GetxController {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      // Remove null values except fullName (which is required)
       updatedData.removeWhere(
         (key, value) => value == null && key != 'fullName',
       );
 
-      // Update Firebase Auth display name
       if (updatedData['username'] != null &&
           updatedData['username'].toString().isNotEmpty) {
         await currentAuthUser.updateDisplayName(updatedData['username']);
       }
 
-      // Also update Firebase Auth for display name if fullName changed
       if (updatedData['fullName'] != null &&
           updatedData['fullName'].toString().isNotEmpty) {
-        // Update Firebase Auth profile
         await currentAuthUser.updateProfile(
           displayName: updatedData['fullName'],
         );
       }
 
-      // Update Firestore user document
       await FirebaseServices.firestore
           .collection('users')
           .doc(currentAuthUser.uid)
           .update(updatedData);
 
-      // Update local user model
       _updateLocalUser(updatedData);
 
-      // Clear updated fields
       updatedFields.clear();
       Get.back();
       Get.snackbar('Success', 'Profile updated successfully');
@@ -137,7 +132,6 @@ class MyProfileController extends GetxController {
     }
   }
 
-
   Future<bool> updateProfilePicture(String? imageUrl) async {
     isUpdating.value = true;
 
@@ -145,12 +139,12 @@ class MyProfileController extends GetxController {
       final currentAuthUser = FirebaseServices.auth.currentUser;
       if (currentAuthUser == null) return false;
 
-      // Update Firebase Auth photoURL
       if (imageUrl != null) {
         await currentAuthUser.updatePhotoURL(imageUrl);
       }
+      
+      await FirebaseServices.auth.currentUser?.updatePhotoURL(imageUrl);
 
-      // Update Firestore user document
       await FirebaseServices.firestore
           .collection('users')
           .doc(currentAuthUser.uid)
@@ -159,20 +153,24 @@ class MyProfileController extends GetxController {
             'updatedAt': FieldValue.serverTimestamp(),
           });
 
-      // Update local user model
       userInfo.value = userInfo.value.copyWith(profilePic: imageUrl);
 
-      Get.snackbar('Success', 'Profile picture updated');
+
+
       return true;
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to update profile picture');
+    } on FirebaseException catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to update profile picture',
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
       return false;
     } finally {
       isUpdating.value = false;
     }
   }
 
-  // Helper method: Update local user model
   void _updateLocalUser(Map<String, dynamic> updatedData) {
     userInfo.value = userInfo.value.copyWith(
       username: updatedData['username'] ?? userInfo.value.username,
@@ -184,7 +182,6 @@ class MyProfileController extends GetxController {
     );
   }
 
-  // New method: Validate form
   bool validateForm() {
     if (usernameController.text.trim().isEmpty) {
       Get.snackbar('Validation Error', 'Username is required');
@@ -196,7 +193,6 @@ class MyProfileController extends GetxController {
       return false;
     }
 
-    // Validate phone number format
     final phone = phoneNumberController.text.trim();
     if (phone.isNotEmpty && !RegExp(r'^[0-9]{10,11}$').hasMatch(phone)) {
       Get.snackbar('Validation Error', 'Please enter a valid phone number');
@@ -206,13 +202,11 @@ class MyProfileController extends GetxController {
     return true;
   }
 
-  // New method: Reset form to original values
   void resetForm() {
     _populateFormFields();
     updatedFields.clear();
   }
 
-  // New method: Check if form has changes
   bool get hasChanges {
     final user = userInfo.value;
 
