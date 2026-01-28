@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/home/controllers/get_all_post_controller.dart';
 import 'package:friendzy_social_media_getx/modules/home/widgets/post_card.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends StatelessWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        clipBehavior: .none,
+        clipBehavior: Clip.none,
         child: Column(
           children: [
             const SizedBox(height: 30),
@@ -32,31 +33,33 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- TOP SEARCH ----------------
   Widget _buildTopSection(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF006680), width: 1),
-              ),
-              child: TextField(
-                onTap: () {
-                  Get.toNamed(AppRoutes.searchPost);
-                },
-
-                decoration: InputDecoration(
-                  hintText: 'Type something ......',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: Color(0xFF006680)),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
+            child: GestureDetector(
+              onTap: () {
+                Get.toNamed(AppRoutes.searchPost);
+              },
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFF006680), width: 1),
+                ),
+                child: const TextField(
+                  autofocus: false,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    hintText: 'Type something ......',
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                    prefixIcon: Icon(Icons.search, color: Color(0xFF006680)),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 10),
+                  ),
                 ),
               ),
             ),
@@ -74,7 +77,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- STORIES ----------------
   Widget _buildStoriesSection(StoryController controller) {
     return Obx(() {
       final stories = controller.storiesByUser;
@@ -87,6 +89,8 @@ class HomeScreen extends StatelessWidget {
           itemCount: stories.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
+              final profileUrl = FirebaseServices.auth.currentUser?.photoURL;
+
               return GestureDetector(
                 onTap: () => Get.toNamed(AppRoutes.addStoryScreen),
                 child: Padding(
@@ -98,24 +102,37 @@ class HomeScreen extends StatelessWidget {
                         alignment: Alignment.bottomCenter,
                         children: [
                           Container(
-                            clipBehavior: .hardEdge,
+                            clipBehavior: Clip.hardEdge,
                             width: 95,
                             height: 160,
                             decoration: BoxDecoration(
-                              image: DecorationImage(
-                                fit: .cover,
-                                image: NetworkImage(
-                                  FirebaseServices.auth.currentUser!.photoURL
-                                      .toString(),
-                                ),
-                              ),
                               border: Border.all(
                                 color: Get.theme.colorScheme.secondary,
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            child: profileUrl == null || profileUrl.isEmpty
+                                ? Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.person, size: 40),
+                                  )
+                                : CachedNetworkImage(
+                                    imageUrl: profileUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.grey[200],
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.person),
+                                        ),
+                                  ),
                           ),
-                          Positioned(
+                          const Positioned(
                             bottom: -15,
                             child: CircleAvatar(
                               radius: 20,
@@ -147,10 +164,20 @@ class HomeScreen extends StatelessWidget {
               );
             }
 
-            // User Story Card
             final storyModel = stories[index - 1];
             final author = storyModel.author;
             final storyItem = storyModel.story;
+
+            final storyImage = storyItem.images.isNotEmpty
+                ? storyItem.images.first
+                : null;
+
+            final profilePic =
+                author.profilePic != null &&
+                    author.profilePic != "null" &&
+                    author.profilePic!.isNotEmpty
+                ? author.profilePic
+                : null;
 
             return GestureDetector(
               onTap: () {
@@ -167,19 +194,34 @@ class HomeScreen extends StatelessWidget {
                       alignment: Alignment.bottomCenter,
                       children: [
                         Container(
+                          clipBehavior: Clip.hardEdge,
                           width: 95,
                           height: 160,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                             borderRadius: BorderRadius.circular(12),
                             color: Colors.grey[200],
-                            image: storyItem.images.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(storyItem.images[0]),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
                           ),
+                          child: storyImage == null
+                              ? Container(
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.image, size: 40),
+                                )
+                              : CachedNetworkImage(
+                                  imageUrl: storyImage,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey[200],
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.image),
+                                      ),
+                                ),
                         ),
                         Positioned(
                           bottom: -15,
@@ -188,9 +230,12 @@ class HomeScreen extends StatelessWidget {
                             backgroundColor: Colors.white,
                             child: CircleAvatar(
                               radius: 17,
-                              backgroundImage: NetworkImage(
-                                author.profilePic.toString(),
-                              ),
+                              backgroundImage: profilePic == null
+                                  ? null
+                                  : CachedNetworkImageProvider(profilePic),
+                              child: profilePic == null
+                                  ? const Icon(Icons.person, size: 18)
+                                  : null,
                             ),
                           ),
                         ),
@@ -199,6 +244,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 14),
                     Text(
                       author.fullName,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -214,7 +260,6 @@ class HomeScreen extends StatelessWidget {
     });
   }
 
-  // ---------------- FEED ----------------
   Widget _buildFeedSection(
     ColorScheme colorScheme,
     GetAllPostController postController,

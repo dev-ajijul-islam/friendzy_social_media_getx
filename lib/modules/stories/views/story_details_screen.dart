@@ -4,6 +4,7 @@ import 'package:friendzy_social_media_getx/data/services/firebase_services.dart'
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class StoryDetailsScreen extends StatelessWidget {
   StoryDetailsScreen({super.key});
@@ -19,7 +20,7 @@ class StoryDetailsScreen extends StatelessWidget {
         final story = controller.currentStory;
 
         final isMe = user?.story.reactors.any(
-          (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
+              (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
         );
 
         return GestureDetector(
@@ -104,8 +105,10 @@ class StoryDetailsScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              user!.author.profilePic.toString(),
+                            backgroundImage: CachedNetworkImageProvider(
+                              user!.author.profilePic?.isNotEmpty == true
+                                  ? user.author.profilePic!
+                                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -207,9 +210,9 @@ class StoryDetailsScreen extends StatelessWidget {
                       icon: controller.isReacting.value
                           ? ButtonLoading()
                           : Icon(
-                              isMe! ? Icons.favorite : Icons.favorite_outline,
-                              color: Colors.red,
-                            ),
+                        isMe! ? Icons.favorite : Icons.favorite_outline,
+                        color: Colors.red,
+                      ),
                       onPressed: () => controller.isReacting.value
                           ? null
                           : controller.react(isMe!),
@@ -237,41 +240,122 @@ class StoryDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget _cachedImage(String url,
+      {double? height, double? width, BoxFit fit = BoxFit.cover}) {
+    return CachedNetworkImage(
+      imageUrl: url,
+      height: height,
+      width: width,
+      fit: fit,
+      placeholder: (context, _) => Container(
+        color: Colors.grey[900],
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      errorWidget: (context, _, __) => Container(
+        color: Colors.grey[800],
+        child: const Icon(Icons.broken_image, color: Colors.white70, size: 40),
+      ),
+    );
+  }
+
   Widget _buildStoryImage(StoryItem story) {
-    final images = story.images;
+    final images = story.images.where((e) => e.isNotEmpty).toList();
 
     if (images.isEmpty) return const SizedBox();
 
-    if (images.length == 1) {
-      return Image.network(
-        images[0],
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-      );
+    switch (images.length) {
+      case 1:
+        return _cachedImage(
+          images[0],
+          fit: BoxFit.cover,
+          height: double.infinity,
+          width: double.infinity,
+        );
+      case 2:
+        return Row(
+          children: [
+            Expanded(
+              child: _cachedImage(images[0],
+                  fit: BoxFit.cover, height: double.infinity),
+            ),
+            Container(width: 2, color: Colors.black),
+            Expanded(
+              child: _cachedImage(images[1],
+                  fit: BoxFit.cover, height: double.infinity),
+            ),
+          ],
+        );
+      case 3:
+        return Column(
+          children: [
+            Expanded(
+              child: _cachedImage(images[0],
+                  fit: BoxFit.cover, width: double.infinity),
+            ),
+            Container(height: 2, color: Colors.black),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _cachedImage(images[1],
+                        fit: BoxFit.cover, height: double.infinity),
+                  ),
+                  Container(width: 2, color: Colors.black),
+                  Expanded(
+                    child: _cachedImage(images[2],
+                        fit: BoxFit.cover, height: double.infinity),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      case 4:
+        return GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            return _cachedImage(images[index], fit: BoxFit.cover);
+          },
+        );
+      default:
+        return GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+          ),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            return Stack(
+              children: [
+                _cachedImage(images[index], fit: BoxFit.cover),
+                if (index == 3)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withOpacity(0.6),
+                      child: Center(
+                        child: Text(
+                          '+${images.length - 4}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
     }
-
-    if (images.length == 2) {
-      return Row(
-        children: images
-            .map(
-              (img) => Expanded(child: Image.network(img, fit: BoxFit.cover)),
-            )
-            .toList(),
-      );
-    }
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 2,
-      ),
-      itemCount: images.length > 4 ? 4 : images.length,
-      itemBuilder: (context, index) {
-        return Image.network(images[index], fit: BoxFit.cover);
-      },
-    );
   }
 }

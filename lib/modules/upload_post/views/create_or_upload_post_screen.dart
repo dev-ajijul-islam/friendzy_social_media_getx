@@ -4,26 +4,26 @@ import 'package:friendzy_social_media_getx/data/models/post_model.dart';
 import 'package:friendzy_social_media_getx/modules/upload_post/controllers/create_or_update_post_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UploadPostScreen extends StatelessWidget {
-  bool isUpdate;
-  PostModel? existingPost;
+  final bool isUpdate;
+  final PostModel? existingPost;
+
   UploadPostScreen({super.key, required this.isUpdate, this.existingPost});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final CreateOrUpdatePostController controller =
-        Get.find<CreateOrUpdatePostController>();
+    Get.find<CreateOrUpdatePostController>();
     final ImageUploadController imageUploadController =
-        Get.find<ImageUploadController>();
+    Get.find<ImageUploadController>();
 
-    if (isUpdate) {
+    if (isUpdate && existingPost != null) {
       controller.captionController.text = existingPost!.caption;
-      controller.hashTags.assignAll(existingPost!.hashTags!);
-      controller.images.assignAll(existingPost!.images!);
-
-      print(existingPost!.toJson());
+      controller.hashTags.assignAll(existingPost!.hashTags ?? []);
+      controller.images.assignAll(existingPost!.images ?? []);
     }
 
     return Scaffold(
@@ -37,11 +37,7 @@ class UploadPostScreen extends StatelessWidget {
         ),
         title: const Text(
           'Post',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
@@ -54,38 +50,41 @@ class UploadPostScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
               _buildLabel("Select Image(s)"),
+
+              // Images Grid
               Container(
-                clipBehavior: .hardEdge,
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF2F2F2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFF006680).withOpacity(0.3),
-                  ),
+                  border: Border.all(color: const Color(0xFF006680).withOpacity(0.3)),
                 ),
                 child: Stack(
-                  clipBehavior: .hardEdge,
                   children: [
                     Positioned.fill(
-                      child: SizedBox(
-                        width: Get.mediaQuery.size.width,
-                        child: Obx(
-                          () => GridView.builder(
-                            itemCount: controller.images.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                ),
-                            itemBuilder: (context, index) {
-                              final image = controller.images[index];
-                              return Card(
-                                clipBehavior: .hardEdge,
-                                child: Image.network(image, fit: .fill),
-                              );
-                            },
+                      child: Obx(
+                            () => GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 4,
+                            mainAxisSpacing: 4,
                           ),
+                          itemCount: controller.images.length,
+                          itemBuilder: (context, index) {
+                            final image = controller.images[index];
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: image,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                errorWidget: (context, url, error) => const Icon(Icons.image),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -94,9 +93,7 @@ class UploadPostScreen extends StatelessWidget {
                       right: 12,
                       child: InkWell(
                         onTap: () {
-                          imageUploadController.uploadImage(
-                            reason: Reason.post,
-                          );
+                          imageUploadController.uploadImage(reason: Reason.post);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(4),
@@ -104,11 +101,7 @@ class UploadPostScreen extends StatelessWidget {
                             border: Border.all(color: const Color(0xFF006680)),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Color(0xFF006680),
-                            size: 20,
-                          ),
+                          child: const Icon(Icons.add, color: Color(0xFF006680), size: 20),
                         ),
                       ),
                     ),
@@ -117,112 +110,89 @@ class UploadPostScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-
-              _buildLabel("Add caption"),
+              _buildLabel("Add Caption"),
               _buildInputField(
-                hint: "",
-                maxLines: 4,
+                hint: "Type Cption for post",
                 controller.captionController,
-                (value) {
-                  if (value.isEmpty) {
-                    return "Enter Caption here..";
-                  }
-                  return null;
-                },
+                    (value) => value!.isEmpty ? "Enter caption here..." : null,
+                maxLines: 4,
               ),
 
               const SizedBox(height: 24),
-
-              _buildLabel("Add has tags"),
+              _buildLabel("Add Hashtags"),
               Row(
                 children: [
                   Expanded(
                     child: _buildInputField(
-                      onSubmit: (value) => controller.addTag,
-                      hint: "",
                       controller.hashTagController,
-                      (value) {
-                        if (controller.hashTags.isEmpty) {
-                          return "Enter a Tags here..";
-                        }
-                        return null;
-                      },
+                          (_) => null,
+                      hint: "Add tag",
+                      onSubmit: (_) => controller.addTag(),
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      controller.addTag();
-                    },
-                    icon: Icon(Icons.add, color: Colors.white),
-                    style: .new(
-                      backgroundColor: WidgetStatePropertyAll(
-                        colorScheme.secondary,
-                      ),
+                    onPressed: controller.addTag,
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(colorScheme.secondary),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
+
+              // Tags Chips
               Obx(
-                () => SizedBox(
+                    () => SizedBox(
                   height: 40,
                   child: ListView.separated(
-                    scrollDirection: .horizontal,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: controller.hashTags.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 6),
                     itemBuilder: (context, index) => GestureDetector(
                       onTap: () => controller.removeTag(index),
                       child: Chip(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: .circular(100),
-                        ),
                         label: Row(
-                          spacing: 5,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(controller.hashTags[index]),
-                            Icon(Icons.close, size: 14, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.close, size: 14, color: Colors.grey),
                           ],
                         ),
-                        side: .none,
-                        color: WidgetStatePropertyAll(
-                          colorScheme.secondary.withAlpha(300),
-                        ),
+                        backgroundColor: colorScheme.secondary.withAlpha(100),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
                       ),
                     ),
-                    separatorBuilder: (context, index) => SizedBox(width: 2),
-                    itemCount: controller.hashTags.length,
                   ),
                 ),
               ),
 
               const SizedBox(height: 40),
 
+              // Create/Update Button
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: Obx(
-                  () => ElevatedButton(
+                      () => ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF006680),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
-                    onPressed: () => controller.inProcess.value
+                    onPressed: controller.inProcess.value
                         ? null
-                        : controller.createOrUpdatePost(
-                            existingPost: existingPost,
-                            isUpdate: isUpdate,
-                          ),
+                        : () => controller.createOrUpdatePost(
+                      existingPost: existingPost,
+                      isUpdate: isUpdate,
+                    ),
                     child: controller.inProcess.value
-                        ? ButtonLoading()
+                        ? const ButtonLoading()
                         : Text(
-                           isUpdate ? "Update" : 'Create',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                      isUpdate ? "Update" : "Create",
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
@@ -233,33 +203,25 @@ class UploadPostScreen extends StatelessWidget {
     );
   }
 
-  // Label Widget
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w400)),
     );
   }
 
   Widget _buildInputField(
-    TextEditingController controller,
-    FormFieldValidator? validator, {
-    required String hint,
-    int maxLines = 1,
-    ValueChanged? onSubmit,
-  }) {
+      TextEditingController controller,
+      FormFieldValidator? validator, {
+        required String hint,
+        int maxLines = 1,
+        ValueChanged<String>? onSubmit,
+      }) {
     return TextFormField(
-      onFieldSubmitted: onSubmit,
-      validator: validator,
       controller: controller,
+      validator: validator,
       maxLines: maxLines,
+      onFieldSubmitted: onSubmit,
       decoration: InputDecoration(
         hintText: hint,
         filled: true,

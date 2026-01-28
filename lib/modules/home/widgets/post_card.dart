@@ -11,18 +11,22 @@ import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:friendzy_social_media_getx/widgets/comment_button.dart';
 import 'package:friendzy_social_media_getx/widgets/like_button.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PostCard extends StatelessWidget {
   PostCard({super.key, required this.postModel});
   final PostModel postModel;
 
   final CreateOrUpdatePostController createOrUpdatePostController =
-      Get.find<CreateOrUpdatePostController>();
+  Get.find<CreateOrUpdatePostController>();
   final DeletePostController deletePostController =
-      Get.find<DeletePostController>();
+  Get.find<DeletePostController>();
 
   @override
   Widget build(BuildContext context) {
+    final bool isMe =
+        postModel.author.uid == FirebaseServices.auth.currentUser!.uid;
+
     return GestureDetector(
       onTap: () =>
           Get.toNamed(AppRoutes.postDetailsScreen, arguments: postModel),
@@ -43,7 +47,7 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildPostHeader(),
+            _buildPostHeader(isMe),
             const SizedBox(height: 12),
             _buildPostCaption(),
             const SizedBox(height: 12),
@@ -56,16 +60,16 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPostHeader() {
+  Widget _buildPostHeader(bool isMe) {
+    final profileUrl = postModel.author.profilePic?.isNotEmpty == true
+        ? postModel.author.profilePic!
+        : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+
     return Row(
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundImage: NetworkImage(
-            postModel.author.profilePic?.isNotEmpty == true
-                ? postModel.author.profilePic!
-                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-          ),
+          backgroundImage: CachedNetworkImageProvider(profileUrl),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -86,33 +90,45 @@ class PostCard extends StatelessWidget {
             ],
           ),
         ),
-        IconButton(
+        isMe
+            ? IconButton(
           icon: const Icon(Icons.more_horiz, size: 20),
           onPressed: () {
             Get.dialog(
               AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: .circular(10)),
-                insetPadding: .zero,
-                titlePadding: .symmetric(vertical: 15, horizontal: 20),
-                title: Text("Take Action", style: Get.textTheme.titleMedium),
-                contentPadding: .only(bottom: 20, left: 20, right: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                insetPadding: EdgeInsets.zero,
+                titlePadding:
+                const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                title: Text(
+                  "Take Action",
+                  style: Get.textTheme.titleMedium,
+                ),
+                contentPadding:
+                const EdgeInsets.only(bottom: 20, left: 20, right: 20),
                 content: Obx(
-                  () => Column(
-                    spacing: 10,
-                    mainAxisSize: .min,
+                      () => Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       ListTile(
                         onTap: () {
-                          deletePostController.deletePost(post: postModel);
+                          deletePostController.deletePost(
+                            post: postModel,
+                          );
                         },
                         shape: RoundedRectangleBorder(
-                          borderRadius: .circular(10),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         tileColor: Colors.grey[200],
-                        title: Text("Delete"),
+                        title: const Text("Delete"),
                         trailing: deletePostController.isDeleting.value
                             ? ButtonLoading()
-                            : Icon(Icons.delete_outline, color: Colors.red),
+                            : const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
                       ),
                       ListTile(
                         onTap: () => Get.to(
@@ -122,17 +138,18 @@ class PostCard extends StatelessWidget {
                           ),
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: .circular(10),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-
                         tileColor: Colors.grey[200],
-                        title: Text("Edit"),
-                        trailing: createOrUpdatePostController.inProcess.value
+                        title: const Text("Edit"),
+                        trailing:
+                        createOrUpdatePostController.inProcess.value
                             ? ButtonLoading()
                             : Icon(
-                                Icons.edit_note_sharp,
-                                color: Get.theme.colorScheme.secondary,
-                              ),
+                          Icons.edit_note_sharp,
+                          color:
+                          Get.theme.colorScheme.secondary,
+                        ),
                       ),
                     ],
                   ),
@@ -140,7 +157,8 @@ class PostCard extends StatelessWidget {
               ),
             );
           },
-        ),
+        )
+            : const SizedBox(),
       ],
     );
   }
@@ -158,9 +176,7 @@ class PostCard extends StatelessWidget {
 
   Widget _buildPostImages() {
     final images = postModel.images ?? [];
-    final imageCount = images.length;
-
-    if (imageCount == 0) return const SizedBox();
+    if (images.isEmpty) return const SizedBox();
 
     return Container(
       decoration: BoxDecoration(
@@ -175,9 +191,7 @@ class PostCard extends StatelessWidget {
   }
 
   Widget _buildImageGrid(List<String> images) {
-    final imageCount = images.length;
-
-    switch (imageCount) {
+    switch (images.length) {
       case 1:
         return _SingleImage(
           imageUrl: images[0],
@@ -224,40 +238,47 @@ class PostCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-
-        commentsCount > 0
-            ? Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  'View all $commentsCount comments',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              )
-            : Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  'No comments yet',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            commentsCount > 0
+                ? 'View all $commentsCount comments'
+                : 'No comments yet',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
       ],
     );
   }
 
   void _openFullScreenImage(List<String> images, int initialIndex) {
     Get.to(
-      () => FullImageScreen(),
+          () => FullImageScreen(),
       arguments: {'images': images, 'initialIndex': initialIndex},
     );
   }
+}
+
+Widget _cachedImage(String url,
+    {double? height, double? width, BoxFit fit = BoxFit.cover}) {
+  return CachedNetworkImage(
+    imageUrl: url,
+    height: height,
+    width: width,
+    fit: fit,
+    placeholder: (context, _) => Container(
+      color: Colors.grey[200],
+      child: const Center(child: CircularProgressIndicator()),
+    ),
+    errorWidget: (context, _, __) => Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.broken_image, size: 40),
+    ),
+  );
 }
 
 // Single Image
@@ -271,12 +292,8 @@ class _SingleImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: 250,
-      ),
+      child: _cachedImage(imageUrl,
+          height: 250, width: double.infinity),
     );
   }
 }
@@ -284,7 +301,6 @@ class _SingleImage extends StatelessWidget {
 // Two Images
 class _TwoImages extends StatelessWidget {
   final List<String> imageUrls;
-
   const _TwoImages({required this.imageUrls});
 
   @override
@@ -294,20 +310,20 @@ class _TwoImages extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: () => Get.to(
-              () => FullImageScreen(),
+                  () => FullImageScreen(),
               arguments: {'images': imageUrls, 'initialIndex': 0},
             ),
-            child: Image.network(imageUrls[0], fit: BoxFit.cover, height: 200),
+            child: _cachedImage(imageUrls[0], height: 200),
           ),
         ),
         Container(width: 1, color: Colors.white),
         Expanded(
           child: GestureDetector(
             onTap: () => Get.to(
-              () => FullImageScreen(),
+                  () => FullImageScreen(),
               arguments: {'images': imageUrls, 'initialIndex': 1},
             ),
-            child: Image.network(imageUrls[1], fit: BoxFit.cover, height: 200),
+            child: _cachedImage(imageUrls[1], height: 200),
           ),
         ),
       ],
@@ -318,7 +334,6 @@ class _TwoImages extends StatelessWidget {
 // Three Images
 class _ThreeImages extends StatelessWidget {
   final List<String> imageUrls;
-
   const _ThreeImages({required this.imageUrls});
 
   @override
@@ -327,15 +342,11 @@ class _ThreeImages extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () => Get.to(
-            () => FullImageScreen(),
+                () => FullImageScreen(),
             arguments: {'images': imageUrls, 'initialIndex': 0},
           ),
-          child: Image.network(
-            imageUrls[0],
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 200,
-          ),
+          child: _cachedImage(imageUrls[0],
+              height: 200, width: double.infinity),
         ),
         Container(height: 1, color: Colors.white),
         Row(
@@ -343,28 +354,20 @@ class _ThreeImages extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => Get.to(
-                  () => FullImageScreen(),
+                      () => FullImageScreen(),
                   arguments: {'images': imageUrls, 'initialIndex': 1},
                 ),
-                child: Image.network(
-                  imageUrls[1],
-                  fit: BoxFit.cover,
-                  height: 150,
-                ),
+                child: _cachedImage(imageUrls[1], height: 150),
               ),
             ),
             Container(width: 1, color: Colors.white),
             Expanded(
               child: GestureDetector(
                 onTap: () => Get.to(
-                  () => FullImageScreen(),
+                      () => FullImageScreen(),
                   arguments: {'images': imageUrls, 'initialIndex': 2},
                 ),
-                child: Image.network(
-                  imageUrls[2],
-                  fit: BoxFit.cover,
-                  height: 150,
-                ),
+                child: _cachedImage(imageUrls[2], height: 150),
               ),
             ),
           ],
@@ -377,7 +380,6 @@ class _ThreeImages extends StatelessWidget {
 // Four Images
 class _FourImages extends StatelessWidget {
   final List<String> imageUrls;
-
   const _FourImages({required this.imageUrls});
 
   @override
@@ -394,14 +396,10 @@ class _FourImages extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => Get.to(
-            () => FullImageScreen(),
+                () => FullImageScreen(),
             arguments: {'images': imageUrls, 'initialIndex': index},
           ),
-          child: Image.network(
-            imageUrls[index],
-            fit: BoxFit.cover,
-            height: 150,
-          ),
+          child: _cachedImage(imageUrls[index], height: 150),
         );
       },
     );
@@ -411,7 +409,6 @@ class _FourImages extends StatelessWidget {
 // Multiple Images (5+)
 class _MultipleImages extends StatelessWidget {
   final List<String> imageUrls;
-
   const _MultipleImages({required this.imageUrls});
 
   @override
@@ -430,19 +427,15 @@ class _MultipleImages extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () => Get.to(
-                () => FullImageScreen(),
+                    () => FullImageScreen(),
                 arguments: {'images': imageUrls, 'initialIndex': index},
               ),
-              child: Image.network(
-                imageUrls[index],
-                fit: BoxFit.cover,
-                height: 150,
-              ),
+              child: _cachedImage(imageUrls[index], height: 150),
             ),
             if (index == 3 && imageUrls.length > 4)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withAlpha(500),
+                  color: Colors.black.withAlpha(150),
                   child: Center(
                     child: Text(
                       '+${imageUrls.length - 4}',

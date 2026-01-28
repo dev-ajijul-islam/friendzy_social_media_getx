@@ -4,6 +4,7 @@ import 'package:friendzy_social_media_getx/modules/chats/controllers/conversatio
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ConversationScreen extends StatelessWidget {
   final String? conversationId;
@@ -56,7 +57,7 @@ class ConversationScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    otherUser.isOnline ? 'Online' : 'Last seen 2hrs ago',
+                    otherUser.isOnline ? 'Online' : 'Last seen',
                     style: const TextStyle(color: Colors.grey, fontSize: 10),
                   ),
                 ],
@@ -91,8 +92,6 @@ class ConversationScreen extends StatelessWidget {
                   );
                 }),
               ),
-
-              // Message Input
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 15,
@@ -150,7 +149,6 @@ class ConversationScreen extends StatelessWidget {
   }
 }
 
-// Message Bubble Widget
 class _MessageBubble extends StatelessWidget {
   final MessageModel message;
 
@@ -172,9 +170,10 @@ class _MessageBubble extends StatelessWidget {
           if (!isMe) ...[
             CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage(
-                message.sender.profilePic ??
-                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+              backgroundImage: CachedNetworkImageProvider(
+                message.sender.profilePic?.isNotEmpty == true
+                    ? message.sender.profilePic!
+                    : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
               ),
             ),
             const SizedBox(width: 8),
@@ -185,7 +184,6 @@ class _MessageBubble extends StatelessWidget {
                   ? CrossAxisAlignment.end
                   : CrossAxisAlignment.start,
               children: [
-                // Text Message
                 if (message.content.type == MessageType.text)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -208,15 +206,13 @@ class _MessageBubble extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      message.content.text!,
+                      message.content.text ?? '',
                       style: TextStyle(
                         color: isMe ? Colors.white : Colors.black,
                         fontSize: 15,
                       ),
                     ),
                   ),
-
-                // Image Message
                 if (message.content.type == MessageType.image)
                   GestureDetector(
                     onTap: () {
@@ -234,30 +230,27 @@ class _MessageBubble extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          message.content.imageUrl!,
+                        child: CachedNetworkImage(
+                          imageUrl: message.content.imageUrl!,
                           fit: BoxFit.cover,
                           width: 250,
                           height: 200,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              width: 250,
-                              height: 200,
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
+                          placeholder: (context, url) => Container(
+                            width: 250,
+                            height: 200,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => const Center(
+                            child: Icon(Icons.broken_image, color: Colors.grey),
+                          ),
                         ),
                       ),
                     ),
                   ),
-
                 const SizedBox(height: 4),
-
-                // Time & Status
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -313,7 +306,14 @@ class FullImageScreen extends StatelessWidget {
       ),
       body: Center(
         child: InteractiveViewer(
-          child: Image.network(imageUrl, fit: BoxFit.contain),
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) =>
+                const Icon(Icons.broken_image, color: Colors.white54, size: 40),
+          ),
         ),
       ),
     );

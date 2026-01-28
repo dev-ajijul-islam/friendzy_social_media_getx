@@ -8,20 +8,17 @@ import 'package:friendzy_social_media_getx/modules/my_profile/controllers/get_my
 import 'package:friendzy_social_media_getx/modules/my_profile/controllers/my_profile_controller.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/routes/app_routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MyProfileScreen extends StatelessWidget {
   const MyProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final MyProfileController profileController =
-        Get.find<MyProfileController>();
-    final GetMyPostsController myPostsController =
-        Get.find<GetMyPostsController>();
-    final GetMyStoriesControllers myStoriesController =
-        Get.find<GetMyStoriesControllers>();
+    final MyProfileController profileController = Get.find<MyProfileController>();
+    final GetMyPostsController myPostsController = Get.find<GetMyPostsController>();
+    final GetMyStoriesControllers myStoriesController = Get.find<GetMyStoriesControllers>();
     final UserModel userInfo = profileController.userInfo.value;
-
     final colorScheme = Theme.of(context).colorScheme;
 
     return DefaultTabController(
@@ -32,35 +29,24 @@ class MyProfileScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-              size: 20,
-            ),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
             onPressed: () => Get.back(),
           ),
           title: const Text(
             'My Profile',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
           child: Obx(
-            () => Column(
-              mainAxisSize: .min,
+                () => Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header Section
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -68,10 +54,17 @@ class MyProfileScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 40,
-                            backgroundImage: NetworkImage(
-                              userInfo.profilePic != null
-                                  ? userInfo.profilePic.toString()
-                                  : 'https://i.pravatar.cc/150?u=5',
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: userInfo.profilePic ?? 'https://i.pravatar.cc/150?u=5',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                errorWidget: (context, url, error) =>
+                                const Icon(Icons.person, size: 40),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 15),
@@ -83,28 +76,19 @@ class MyProfileScreen extends StatelessWidget {
                                   profileController.isProfileInfoLoading.value
                                       ? "--"
                                       : userInfo.fullName.toString(),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   profileController.isProfileInfoLoading.value
                                       ? "--"
                                       : userInfo.email.toString(),
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 13,
-                                  ),
+                                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                                 ),
                               ],
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(
-                              Icons.logout_outlined,
-                              color: Colors.red,
-                            ),
+                            icon: const Icon(Icons.logout_outlined, color: Colors.red),
                             onPressed: () async {
                               await FirebaseServices.auth.signOut();
                               Get.offAndToNamed(AppRoutes.signInScreen);
@@ -116,14 +100,8 @@ class MyProfileScreen extends StatelessWidget {
                       Text(
                         profileController.isProfileInfoLoading.value
                             ? "--"
-                            : userInfo.bio != null
-                            ? userInfo.bio.toString()
-                            : "No bio found",
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          color: Colors.black87,
-                        ),
+                            : userInfo.bio?.toString() ?? "No bio found",
+                        style: const TextStyle(fontSize: 13, height: 1.4, color: Colors.black87),
                       ),
                       const SizedBox(height: 20),
 
@@ -144,10 +122,7 @@ class MyProfileScreen extends StatelessWidget {
                           },
                           child: const Text(
                             'Edit Profile',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -163,21 +138,16 @@ class MyProfileScreen extends StatelessWidget {
                     children: [
                       _buildStatItem(userInfo.postsCount.toString(), "Posts"),
                       _buildVerticalDivider(),
-                      _buildStatItem(
-                        userInfo.followingCount.toString(),
-                        "Following",
-                      ),
+                      _buildStatItem(userInfo.followingCount.toString(), "Following"),
                       _buildVerticalDivider(),
-                      _buildStatItem(
-                        userInfo.followersCount.toString(),
-                        "Followers",
-                      ),
+                      _buildStatItem(userInfo.followersCount.toString(), "Followers"),
                     ],
                   ),
                 ),
 
+                // Tabs
                 TabBar(
-                  tabs: [
+                  tabs: const [
                     Tab(text: "Posts"),
                     Tab(text: "Stories"),
                   ],
@@ -187,117 +157,108 @@ class MyProfileScreen extends StatelessWidget {
                   height: MediaQuery.of(context).size.height / 2,
                   child: TabBarView(
                     children: [
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 1,
-                            ),
-                        itemCount: myPostsController.myPosts.length,
-                        itemBuilder: (context, index) {
-                          if (myPostsController.isLoading.value) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-
-                          if (myPostsController.myPosts.isEmpty) {
-                            return Center(child: Text("There is no story yet"));
-                          }
-
-                          final PostModel post =
-                              myPostsController.myPosts[index];
-
-                          return GestureDetector(
-                            onTap: () => Get.toNamed(
-                              AppRoutes.postDetailsScreen,
-                              arguments: post,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: post.images!.isEmpty
-                                  ? Card(
-                                      child: Center(
-                                        child: Text(
-                                          post.caption.length > 15
-                                              ? "${post.caption.substring(0, 15)}.."
-                                              : post.caption,
-                                          textAlign: .center,
-                                        ),
-                                      ),
-                                    )
-                                  : Card(
-                                      clipBehavior: .hardEdge,
-                                      child: Image.network(
-                                        post.images!.first.toString(),
-                                        fit: BoxFit.cover,
-                                      ),
+                      // Posts Grid
+                      Obx(() {
+                        if (myPostsController.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (myPostsController.myPosts.isEmpty) {
+                          return const Center(child: Text("No posts yet"));
+                        }
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                          ),
+                          itemCount: myPostsController.myPosts.length,
+                          itemBuilder: (context, index) {
+                            final PostModel post = myPostsController.myPosts[index];
+                            return GestureDetector(
+                              onTap: () => Get.toNamed(AppRoutes.postDetailsScreen, arguments: post),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: post.images!.isEmpty
+                                    ? Card(
+                                  child: Center(
+                                    child: Text(
+                                      post.caption.length > 15
+                                          ? "${post.caption.substring(0, 15)}.."
+                                          : post.caption,
+                                      textAlign: TextAlign.center,
                                     ),
-                            ),
-                          );
-                        },
-                      ),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 1,
-                            ),
-                        itemCount: myStoriesController.myStories.length,
-                        itemBuilder: (context, index) {
-                          if (myStoriesController.isLoading.value) {
-                            return Center(child: CircularProgressIndicator());
-                          }
+                                  ),
+                                )
+                                    : CachedNetworkImage(
+                                  imageUrl: post.images!.first.toString(),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(strokeWidth: 2)),
+                                  errorWidget: (context, url, error) =>
+                                  const Icon(Icons.image, size: 30),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }),
 
-                          if (myStoriesController.myStories.isEmpty) {
-                            return Center(child: Text("There is no story yet"));
-                          }
-
-                          final StoryModel story =
-                              myStoriesController.myStories[index];
-
-                          return GestureDetector(
-                            onTap: () {
-                              Get.toNamed(AppRoutes.storyDetailsScreen);
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: story.story.images.isEmpty
-                                  ? Card(
-                                      child: Center(
-                                        child: Text(
-                                          story.story.captions.length > 15
-                                              ? "${story.story.captions.substring(0, 15)}.."
-                                              : story.story.captions,
-                                          textAlign: .center,
-                                        ),
-                                      ),
-                                    )
-                                  : Card(
-                                      clipBehavior: .hardEdge,
-                                      child: Image.network(
-                                        story.story.images.first.toString(),
-                                        fit: BoxFit.cover,
-                                      ),
+                      // Stories Grid
+                      Obx(() {
+                        if (myStoriesController.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (myStoriesController.myStories.isEmpty) {
+                          return const Center(child: Text("No stories yet"));
+                        }
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                          ),
+                          itemCount: myStoriesController.myStories.length,
+                          itemBuilder: (context, index) {
+                            final StoryModel story = myStoriesController.myStories[index];
+                            return GestureDetector(
+                              onTap: () => Get.toNamed(AppRoutes.storyDetailsScreen),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: story.story.images.isEmpty
+                                    ? Card(
+                                  child: Center(
+                                    child: Text(
+                                      story.story.captions.length > 15
+                                          ? "${story.story.captions.substring(0, 15)}.."
+                                          : story.story.captions,
+                                      textAlign: TextAlign.center,
                                     ),
-                            ),
-                          );
-                        },
-                      ),
+                                  ),
+                                )
+                                    : CachedNetworkImage(
+                                  imageUrl: story.story.images.first.toString(),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(strokeWidth: 2)),
+                                  errorWidget: (context, url, error) =>
+                                  const Icon(Icons.image, size: 30),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 20),
               ],
             ),
@@ -310,10 +271,7 @@ class MyProfileScreen extends StatelessWidget {
   Widget _buildStatItem(String count, String label) {
     return Column(
       children: [
-        Text(
-          count,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
+        Text(count, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
       ],
     );

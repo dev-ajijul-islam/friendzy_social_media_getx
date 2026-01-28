@@ -3,21 +3,17 @@ import 'package:friendzy_social_media_getx/controllers/image_upload_controller.d
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-class AddStoryScreen extends StatefulWidget {
+class AddStoryScreen extends StatelessWidget {
   const AddStoryScreen({super.key});
 
   @override
-  State<AddStoryScreen> createState() => _AddStoryScreenState();
-}
-
-class _AddStoryScreenState extends State<AddStoryScreen> {
-  final ImageUploadController imageUploadController =
-      Get.find<ImageUploadController>();
-  final StoryController storyController = Get.find<StoryController>();
-
-  @override
   Widget build(BuildContext context) {
+    final ImageUploadController imageUploadController =
+    Get.find<ImageUploadController>();
+    final StoryController storyController = Get.find<StoryController>();
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -31,7 +27,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       ),
       body: Column(
         children: [
-          // ---------------- PREVIEW AREA ----------------
+          // ---------------- IMAGE PREVIEW ----------------
           Expanded(
             child: Container(
               width: double.infinity,
@@ -39,14 +35,10 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               child: Obx(() {
                 if (storyController.selectedImages.isEmpty) {
                   return const Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: 120,
-                      color: Colors.white38,
-                    ),
+                    child: Icon(Icons.image_outlined, size: 120, color: Colors.white38),
                   );
                 }
-                return _buildImagePreviewGrid(storyController.selectedImages);
+                return _buildImageGrid(storyController.selectedImages);
               }),
             ),
           ),
@@ -64,10 +56,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Caption",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
+                const Text("Caption", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: storyController.captionController,
@@ -83,45 +72,43 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                   ),
                 ),
                 const SizedBox(height: 15),
+
+                // Add Image Button
                 Align(
                   child: GestureDetector(
                     onTap: () => imageUploadController.isUploading.value
                         ? null
-                        : imageUploadController.uploadImage(
-                            reason: Reason.story,
-                          ),
+                        : imageUploadController.uploadImage(reason: Reason.story),
                     child: CircleAvatar(
                       backgroundColor: Get.theme.colorScheme.secondary,
                       radius: 40,
-                      child: Icon(Icons.add_photo_alternate, size: 35),
+                      child: const Icon(Icons.add_photo_alternate, size: 35),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Post Story Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: Obx(
-                    () => ElevatedButton(
+                        () => ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF006680),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: storyController.isLoading.value ? null : _submitStory(storyController),
+                      child: storyController.isLoading.value
+                          ? const ButtonLoading()
+                          : const Text(
+                        "Post Story",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      onPressed: () => storyController.isLoading.value
-                          ? null
-                          : submitStory(),
-                      child: storyController.isLoading.value
-                          ? ButtonLoading()
-                          : Text(
-                              "Post Story",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                     ),
                   ),
                 ),
@@ -133,154 +120,56 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     );
   }
 
-  // ---------------- ACTION BUTTON ----------------
-  Widget _actionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-              color: Colors.grey,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.black87),
-          ),
-          const SizedBox(height: 6),
-          Text(label, style: const TextStyle(fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
-  // ---------------- SUBMIT HANDLER ----------------
-  void submitStory() {
-    if (storyController.captionController.text.trim().isEmpty) {
-      Future.delayed(const Duration(milliseconds: 800), () {
-        Get.back();
-      });
-
-      Get.snackbar(
-        "Missing Caption",
-        "Please write a caption for your story",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
+  // ---------------- IMAGE GRID ----------------
+  Widget _buildImageGrid(List<String> images) {
+    if (images.length == 1) {
+      return _singleImage(images[0]);
+    } else if (images.length == 2) {
+      return _twoImages(images);
+    } else if (images.length == 3) {
+      return _threeImages(images);
+    } else {
+      return _multiImages(images);
     }
-
-    storyController.createStory();
   }
 
-  // ---------------- IMAGE GRID PREVIEW ----------------
-  Widget _buildImagePreviewGrid(List<String> images) {
-    final count = images.length;
+  Widget _singleImage(String url) => ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child: CachedNetworkImage(imageUrl: url, fit: BoxFit.cover),
+  );
 
-    if (count == 1) {
-      return GestureDetector(
-        onTap: () {},
+  Widget _twoImages(List<String> urls) => Row(
+    children: urls.map((url) {
+      int idx = urls.indexOf(url);
+      return Expanded(
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.network(
-            images[0],
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
+          borderRadius: idx == 0
+              ? const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10))
+              : const BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
+          child: CachedNetworkImage(imageUrl: url, fit: BoxFit.cover),
         ),
       );
-    }
+    }).toList(),
+  );
 
-    if (count == 2) {
-      return Row(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[0],
-                fit: BoxFit.cover,
-                height: double.infinity,
-              ),
-            ),
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[1],
-                fit: BoxFit.cover,
-                height: double.infinity,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+  Widget _threeImages(List<String> urls) => Column(
+    children: [
+      Expanded(child: _singleImage(urls[0])),
+      const SizedBox(height: 2),
+      Expanded(
+        child: Row(
+          children: [
+            Expanded(child: _singleImage(urls[1])),
+            const SizedBox(width: 2),
+            Expanded(child: _singleImage(urls[2])),
+          ],
+        ),
+      ),
+    ],
+  );
 
-    if (count == 3) {
-      return Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              child: Image.network(
-                images[0],
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
-          ),
-          const SizedBox(height: 2),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                    ),
-                    child: Image.network(
-                      images[1],
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 2),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(10),
-                    ),
-                    child: Image.network(
-                      images[2],
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    // 4 or more images
+  Widget _multiImages(List<String> urls) {
+    final displayCount = urls.length > 4 ? 4 : urls.length;
     return Stack(
       children: [
         GridView.builder(
@@ -292,26 +181,20 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             crossAxisSpacing: 2,
             mainAxisSpacing: 2,
           ),
-          itemCount: count > 4 ? 4 : count,
-          itemBuilder: (context, index) {
-            return ClipRRect(
-              borderRadius: _getBorderRadius(index, 4),
-              child: Image.network(images[index], fit: BoxFit.cover),
-            );
-          },
+          itemCount: displayCount,
+          itemBuilder: (_, idx) => ClipRRect(
+            borderRadius: _getBorderRadius(idx, displayCount),
+            child: CachedNetworkImage(imageUrl: urls[idx], fit: BoxFit.cover),
+          ),
         ),
-        if (count > 4)
+        if (urls.length > 4)
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withAlpha(400),
               child: Center(
                 child: Text(
-                  '+${count - 4}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  '+${urls.length - 4}',
+                  style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -333,5 +216,20 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       default:
         return BorderRadius.zero;
     }
+  }
+
+  // ---------------- SUBMIT ----------------
+  VoidCallback _submitStory(StoryController storyController) {
+    return () {
+      if (storyController.captionController.text.trim().isEmpty) {
+        Get.snackbar(
+          "Missing Caption",
+          "Please write a caption for your story",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+      storyController.createStory();
+    };
   }
 }

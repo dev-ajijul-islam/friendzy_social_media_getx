@@ -3,10 +3,10 @@ import 'package:friendzy_social_media_getx/modules/chats/controllers/chat_contro
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/data/models/conversation_model.dart';
 import 'package:friendzy_social_media_getx/data/models/message_model.dart';
-
 import 'package:friendzy_social_media_getx/modules/chats/views/conversation_screen.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatsScreen extends StatelessWidget {
   const ChatsScreen({super.key});
@@ -45,7 +45,6 @@ class ChatsScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Container(
@@ -84,15 +83,10 @@ class ChatsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Tab Content
             Expanded(
               child: TabBarView(
                 children: [
-                  // All Users Tab
                   _AllUsersTab(colorScheme: colorScheme),
-
-                  // Conversations Tab
                   _ConversationsTab(colorScheme: colorScheme),
                 ],
               ),
@@ -104,7 +98,6 @@ class ChatsScreen extends StatelessWidget {
   }
 }
 
-// All Users Tab
 class _AllUsersTab extends StatelessWidget {
   final ColorScheme colorScheme;
 
@@ -135,7 +128,6 @@ class _AllUsersTab extends StatelessWidget {
   }
 }
 
-// User Tile Widget
 class _UserTile extends StatelessWidget {
   final UserModel user;
   final ColorScheme colorScheme;
@@ -150,9 +142,10 @@ class _UserTile extends StatelessWidget {
       },
       leading: CircleAvatar(
         radius: 25,
-        backgroundImage: NetworkImage(
-          user.profilePic ??
-              "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+        backgroundImage: CachedNetworkImageProvider(
+          user.profilePic?.isNotEmpty == true
+              ? user.profilePic!
+              : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
         ),
       ),
       title: Text(
@@ -173,7 +166,6 @@ class _UserTile extends StatelessWidget {
     return FutureBuilder<bool>(
       future: controller.hasConversationWith(user.uid!),
       builder: (context, snapshot) {
-
         final hasConv = snapshot.data ?? false;
         return Container(
           constraints: const BoxConstraints(maxWidth: 80),
@@ -198,7 +190,6 @@ class _UserTile extends StatelessWidget {
   }
 }
 
-// Conversations Tab
 class _ConversationsTab extends StatelessWidget {
   final ColorScheme colorScheme;
 
@@ -232,7 +223,6 @@ class _ConversationsTab extends StatelessWidget {
   }
 }
 
-// Conversation Tile Widget
 class _ConversationTile extends StatelessWidget {
   final ConversationModel conversation;
   final ColorScheme colorScheme;
@@ -261,7 +251,11 @@ class _ConversationTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundImage: NetworkImage(conversation.photo),
+            backgroundImage: CachedNetworkImageProvider(
+              conversation.photo.isNotEmpty
+                  ? conversation.photo
+                  : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+            ),
           ),
           if (isOnline)
             Positioned(

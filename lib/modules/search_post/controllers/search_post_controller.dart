@@ -24,7 +24,7 @@ class SearchPostController extends GetxController {
           .get();
 
       final result = querySnapshot.docs
-          .map((doc) => PostModel.fromJson(doc.data()))
+          .map((doc) => PostModel.fromJson({...doc.data(), "postId": doc.id}))
           .toList();
 
       allPosts.assignAll(result);
