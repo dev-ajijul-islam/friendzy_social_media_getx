@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friendzy_social_media_getx/data/models/story_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:friendzy_social_media_getx/modules/stories/controllers/story_controller.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:friendzy_social_media_getx/widgets/button_loading.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -36,7 +37,6 @@ class StoryDetailsScreen extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(child: _buildStoryImage(story!)),
-
               Positioned(
                 top: 0,
                 left: 0,
@@ -55,7 +55,6 @@ class StoryDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -75,7 +74,6 @@ class StoryDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               SafeArea(
                 child: Column(
                   children: [
@@ -99,32 +97,35 @@ class StoryDetailsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(
-                              user!.author.profilePic?.isNotEmpty == true
-                                  ? user.author.profilePic!
-                                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(
+                          AppRoutes.userProfile,
+                          arguments: user.author,
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(
+                                user!.author.profilePic?.isNotEmpty == true
+                                    ? user.author.profilePic!
+                                    : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            user.author.fullName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(width: 10),
+                            Text(
+                              user.author.fullName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-
                     const Spacer(),
-
                     if (story.captions.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -139,9 +140,7 @@ class StoryDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                     const SizedBox(height: 12),
-
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Container(
@@ -169,26 +168,26 @@ class StoryDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              Positioned.fill(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: controller.previousUser,
-                        child: Container(color: Colors.transparent),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: controller.nextUser,
-                        child: Container(color: Colors.transparent),
-                      ),
-                    ),
-                  ],
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 80,
+                child: GestureDetector(
+                  onTap: controller.previousUser,
+                  child: Container(color: Colors.transparent),
                 ),
               ),
-
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 80,
+                child: GestureDetector(
+                  onTap: controller.nextUser,
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
               Positioned(
                 bottom: 120,
                 right: 10,
@@ -224,7 +223,6 @@ class StoryDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
               Positioned(
                 top: 50,
                 right: 20,
@@ -251,7 +249,7 @@ class StoryDetailsScreen extends StatelessWidget {
         color: Colors.grey[900],
         child: const Center(child: CircularProgressIndicator()),
       ),
-      errorWidget: (context, _, __) => Container(
+      errorWidget: (context, _, _) => Container(
         color: Colors.grey[800],
         child: const Icon(Icons.broken_image, color: Colors.white70, size: 40),
       ),
