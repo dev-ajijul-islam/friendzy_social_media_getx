@@ -63,13 +63,15 @@ class PostDetailsScreen extends StatelessWidget {
                             return Center(child: CircularProgressIndicator());
                           }
 
-                          if (snapshot.hasError || !snapshot.hasData) {
-                            return Center(child: Text("Post not found"));
+                          if (!snapshot.hasData ||
+                              snapshot.data!.data() == null) {
+                            Get.back();
+                            return Center(child: Text("Post deleted"));
                           }
 
                           final post = PostModel.fromJson({
                             ...snapshot.data!.data()!,
-                            "postId": snapshot.data?.id,
+                            "postId": snapshot.data!.id,
                           });
 
                           return PostCard(postModel: post);

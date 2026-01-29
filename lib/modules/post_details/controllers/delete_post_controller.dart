@@ -16,6 +16,10 @@ class DeletePostController extends GetxController {
           .collection("posts")
           .doc(post.postId)
           .delete();
+      await FirebaseServices.firestore
+          .collection("users")
+          .doc(post.author.uid)
+          .update({"postsCount": FieldValue.increment(-1)});
       Get.back();
       Get.snackbar(
         "Success",

@@ -21,7 +21,7 @@ class StoryDetailsScreen extends StatelessWidget {
         final story = controller.currentStory;
 
         final isMe = user?.story.reactors.any(
-              (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
+          (u) => u.uid == FirebaseServices.auth.currentUser!.uid,
         );
 
         return GestureDetector(
@@ -209,9 +209,9 @@ class StoryDetailsScreen extends StatelessWidget {
                       icon: controller.isReacting.value
                           ? ButtonLoading()
                           : Icon(
-                        isMe! ? Icons.favorite : Icons.favorite_outline,
-                        color: Colors.red,
-                      ),
+                              isMe! ? Icons.favorite : Icons.favorite_outline,
+                              color: Colors.red,
+                            ),
                       onPressed: () => controller.isReacting.value
                           ? null
                           : controller.react(isMe!),
@@ -238,8 +238,12 @@ class StoryDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _cachedImage(String url,
-      {double? height, double? width, BoxFit fit = BoxFit.cover}) {
+  Widget _cachedImage(
+    String url, {
+    double? height,
+    double? width,
+    BoxFit fit = BoxFit.cover,
+  }) {
     return CachedNetworkImage(
       imageUrl: url,
       height: height,
@@ -273,13 +277,19 @@ class StoryDetailsScreen extends StatelessWidget {
         return Row(
           children: [
             Expanded(
-              child: _cachedImage(images[0],
-                  fit: BoxFit.cover, height: double.infinity),
+              child: _cachedImage(
+                images[0],
+                fit: BoxFit.cover,
+                height: double.infinity,
+              ),
             ),
             Container(width: 2, color: Colors.black),
             Expanded(
-              child: _cachedImage(images[1],
-                  fit: BoxFit.cover, height: double.infinity),
+              child: _cachedImage(
+                images[1],
+                fit: BoxFit.cover,
+                height: double.infinity,
+              ),
             ),
           ],
         );
@@ -287,21 +297,30 @@ class StoryDetailsScreen extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: _cachedImage(images[0],
-                  fit: BoxFit.cover, width: double.infinity),
+              child: _cachedImage(
+                images[0],
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
             Container(height: 2, color: Colors.black),
             Expanded(
               child: Row(
                 children: [
                   Expanded(
-                    child: _cachedImage(images[1],
-                        fit: BoxFit.cover, height: double.infinity),
+                    child: _cachedImage(
+                      images[1],
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                    ),
                   ),
                   Container(width: 2, color: Colors.black),
                   Expanded(
-                    child: _cachedImage(images[2],
-                        fit: BoxFit.cover, height: double.infinity),
+                    child: _cachedImage(
+                      images[2],
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                    ),
                   ),
                 ],
               ),
