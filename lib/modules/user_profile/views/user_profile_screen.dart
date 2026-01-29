@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/modules/friends/controllers/friends_controllers.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
@@ -10,9 +11,12 @@ class UserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserModel user = Get.arguments;
-    final UserProfileController controller = Get.put(UserProfileController(user));
+    final UserProfileController controller = Get.put(
+      UserProfileController(user),
+    );
 
-    const Color primaryTeal = Color(0xFF006680);
+    final FriendsControllers friendsControllers =
+        Get.find<FriendsControllers>();
 
     return DefaultTabController(
       length: 2,
@@ -22,7 +26,11 @@ class UserProfileScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+              size: 20,
+            ),
             onPressed: () => Get.back(),
           ),
           title: const Text(
@@ -49,7 +57,10 @@ class UserProfileScreen extends StatelessWidget {
               children: [
                 // Header Section
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -60,15 +71,18 @@ class UserProfileScreen extends StatelessWidget {
                             backgroundColor: Colors.grey[200],
                             child: ClipOval(
                               child: CachedNetworkImage(
-                                imageUrl: user.profilePic ??
+                                imageUrl:
+                                    user.profilePic ??
                                     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) =>
-                                const CircularProgressIndicator(strokeWidth: 2),
+                                    const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                 errorWidget: (context, url, error) =>
-                                const Icon(Icons.person, size: 40),
+                                    const Icon(Icons.person, size: 40),
                               ),
                             ),
                           ),
@@ -107,7 +121,6 @@ class UserProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      // Action Buttons: Message + Follow/Unfollow
                       Row(
                         children: [
                           Container(
@@ -118,40 +131,53 @@ class UserProfileScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: IconButton(
-                              icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                              onPressed: () {
-                                // TODO: implement message
-                              },
+                              icon: const Icon(
+                                Icons.chat_bubble_outline,
+                                size: 20,
+                              ),
+                              onPressed: () {},
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Obx(() {
-                              bool isFollowing = controller.isFollowing.value;
-                              return SizedBox(
-                                height: 48,
-                                child: ElevatedButton(
+                            child: StreamBuilder<bool>(
+                              stream: friendsControllers.isFollowingStream(
+                                user.uid!,
+                              ),
+                              builder: (context, snapshot) {
+                                final isFollowing = snapshot.data ?? false;
+                                final isProcessing =
+                                    friendsControllers.loadingUserId.value ==
+                                    user.uid;
+
+                                return ElevatedButton(
+                                  onPressed: isProcessing
+                                      ? null
+                                      : () => friendsControllers.toggleFollow(
+                                          targetUser: user,
+                                        ),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                    isFollowing ? Colors.grey.shade300 : primaryTeal,
+                                    minimumSize: .new(.infinity, 48),
+                                    backgroundColor: isFollowing
+                                        ? Colors.grey.shade300
+                                        : Get.theme.colorScheme.secondary,
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  onPressed: () {
-                                   controller.toggleFollow();
-                                  },
                                   child: Text(
-                                    isFollowing ? 'Following' : 'Follow',
-                                    style: TextStyle(
-                                      color: isFollowing ? Colors.black87 : Colors.white,
+                                    isFollowing ? "Unfollow" : "Follow",
+                                    style: .new(
+                                      color: isFollowing
+                                          ? Colors.black87
+                                          : Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -167,16 +193,25 @@ class UserProfileScreen extends StatelessWidget {
                     children: [
                       _buildStatItem(user.postsCount.toString(), "Posts"),
                       _buildVerticalDivider(),
-                      _buildStatItem(user.followingCount.toString(), "Following"),
+                      _buildStatItem(
+                        user.followingCount.toString(),
+                        "Following",
+                      ),
                       _buildVerticalDivider(),
-                      _buildStatItem(user.followersCount.toString(), "Followers"),
+                      _buildStatItem(
+                        user.followersCount.toString(),
+                        "Followers",
+                      ),
                     ],
                   ),
                 ),
 
                 // Followers Horizontal List
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: const Text(
                     'Followers',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -195,7 +230,7 @@ class UserProfileScreen extends StatelessWidget {
                         "Qudus",
                         "Joe",
                         "Ojogbon",
-                        "Chris"
+                        "Chris",
                       ];
                       return Padding(
                         padding: const EdgeInsets.only(right: 15),
@@ -204,13 +239,16 @@ class UserProfileScreen extends StatelessWidget {
                             CircleAvatar(
                               radius: 30,
                               backgroundImage: NetworkImage(
-                                  'https://i.pravatar.cc/150?u=user$index'),
+                                'https://i.pravatar.cc/150?u=user$index',
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               names[index % names.length],
-                              style:
-                              const TextStyle(fontSize: 11, color: Colors.black87),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.black87,
+                              ),
                             ),
                           ],
                         ),
@@ -235,11 +273,11 @@ class UserProfileScreen extends StatelessWidget {
                       GridView.builder(
                         padding: const EdgeInsets.all(10),
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                        ),
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                            ),
                         itemCount: user.postsCount,
                         itemBuilder: (context, index) {
                           return ClipRRect(
@@ -254,11 +292,11 @@ class UserProfileScreen extends StatelessWidget {
                       GridView.builder(
                         padding: const EdgeInsets.all(10),
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                        ),
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                            ),
                         itemCount: 6,
                         itemBuilder: (context, index) {
                           return ClipRRect(
@@ -285,8 +323,10 @@ class UserProfileScreen extends StatelessWidget {
   Widget _buildStatItem(String count, String label) {
     return Column(
       children: [
-        Text(count,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          count,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
       ],
     );

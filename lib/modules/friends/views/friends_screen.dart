@@ -418,7 +418,7 @@ class _UserAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: 30,
       backgroundColor: Colors.grey[200],
-      backgroundImage: null, // remove NetworkImage
+      backgroundImage: null,
       child: ClipOval(
         child: CachedNetworkImage(
           imageUrl: profilePic,
