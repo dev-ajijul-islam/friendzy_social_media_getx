@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/modules/chats/views/conversation_screen.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/friends_controllers.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -135,7 +136,9 @@ class UserProfileScreen extends StatelessWidget {
                                 Icons.chat_bubble_outline,
                                 size: 20,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() => ConversationScreen(targetUser: user));
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
