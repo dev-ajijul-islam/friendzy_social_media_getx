@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/followers_controllers.dart';
@@ -369,7 +370,10 @@ class _UserTile extends StatelessWidget {
       children: [
         if (showFollowButton) _buildFollowButton(),
         if (showFollowButton) const SizedBox(width: 10),
-        _buildViewProfileButton(),
+        GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.userProfile, arguments: user),
+          child: _buildViewProfileButton(),
+        ),
       ],
     );
   }
