@@ -197,6 +197,7 @@ class _TabContent extends StatelessWidget {
               child: users.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
+                      padding: .only(bottom: 100),
                       itemCount: users.length,
                       itemBuilder: (context, index) {
                         final user = users[index];
