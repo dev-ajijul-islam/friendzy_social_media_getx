@@ -12,6 +12,7 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final controller = Get.find<WelcomeController>();
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -19,64 +20,65 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: Obx(
-          () => Column(
-            children: [
-              Expanded(
-                child: PageView.builder(
-                  controller: controller.pageController,
-                  onPageChanged: (index) {
-                    controller.changePage(index);
-                  },
-                  itemCount: controller.pages.length,
-                  itemBuilder: (context, index) {
-                    final page = controller.pages[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        children: [
-                          const Spacer(flex: 1),
-                          _buildAvatarSection(colorScheme),
-                          const Spacer(flex: 1),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              page["title"]!,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
+        child: Stack(
+          children: [
+            Obx(
+                  () => Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: controller.pageController,
+                      onPageChanged: (index) {
+                        controller.changePage(index);
+                      },
+                      itemCount: controller.pages.length,
+                      itemBuilder: (context, index) {
+                        final page = controller.pages[index];
+                        return Padding(
+                          padding:
+                          const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Column(
+                            children: [
+                              const Spacer(flex: 1),
+                              _buildAvatarSection(colorScheme),
+                              const Spacer(flex: 1),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  page["title"]!,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              page['desc']!,
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: colorScheme.onSurface.withOpacity(0.6),
-                                height: 1.5,
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  page['desc']!,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: colorScheme.onSurface
+                                        .withAlpha(600),
+                                    height: 1.5,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const Spacer(flex: 1),
+                            ],
                           ),
-                          const Spacer(flex: 1),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 20,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 20,
+                    ),
+                    child: SizedBox(
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
@@ -89,7 +91,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         onPressed: () {
                           if (controller.isLastPage.value) {
-                           Get.offAndToNamed(AppRoutes.signInScreen);
+                            Get.offAndToNamed(AppRoutes.signInScreen);
                           } else {
                             controller.pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
@@ -98,7 +100,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           }
                         },
                         child: Text(
-                          controller.isLastPage.value ? 'Get Started' : 'Next',
+                          controller.isLastPage.value
+                              ? 'Get Started'
+                              : 'Next',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -106,11 +110,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+
+            Positioned(
+              top: 8,
+              right: 8,
+              child: TextButton(
+                onPressed: () {
+                  Get.offAndToNamed(AppRoutes.signInScreen);
+                },
+                child: Text(
+                  'Skip',
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 15,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -121,14 +142,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       height: 260,
       width: double.infinity,
       child: Stack(
-        clipBehavior: .none,
         alignment: Alignment.center,
         children: [
           Container(
             width: 160,
             height: 160,
             decoration: BoxDecoration(
-              color: colorScheme.secondary.withOpacity(0.1),
+              color: colorScheme.secondary.withAlpha(600),
               shape: BoxShape.circle,
             ),
           ),
@@ -141,24 +161,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               color: Color(0xFF00334E),
             ),
           ),
-
           Positioned(top: 20, left: 50, child: _smallDot(colorScheme, 20)),
           Positioned(top: 0, right: 40, child: _smallDot(colorScheme, 30)),
           Positioned(bottom: 50, left: 30, child: _smallDot(colorScheme, 25)),
           Positioned(bottom: 20, right: 60, child: _smallDot(colorScheme, 35)),
-          Positioned(
-            top: -55,
-            right: 0,
-            child: TextButton(
-              onPressed: () {
-                Get.offAndToNamed(AppRoutes.signInScreen);
-              },
-              child: Text(
-                'Skip',
-                style: TextStyle(color: colorScheme.onSurface, fontSize: 15),
-              ),
-            ),
-          ),
         ],
       ),
     );
