@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/notification_model.dart';
 import 'package:get/get.dart';
 import '../controllers/notification_controller.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -8,7 +10,6 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NotificationController());
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -21,41 +22,37 @@ class NotificationScreen extends StatelessWidget {
         ),
         title: const Text(
           'Notifications',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
-      body: Obx(() => ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: [
-
-        ],
-      )),
+      body: Obx(() {
+        return ListView.separated(
+          itemCount: controller.notifications.length,
+          separatorBuilder: (context, index) => SizedBox(height: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemBuilder: (context, index) {
+            final NotificationModel notification =
+                controller.notifications[index];
+            return _buildNotificationTile(notification);
+          },
+        );
+      }),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationTile(Map<String, dynamic> noti, ColorScheme color) {
+  Widget _buildNotificationTile(NotificationModel notification) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
         children: [
           CircleAvatar(
             radius: 22,
-            backgroundImage: NetworkImage(noti['image']),
+            backgroundImage: NetworkImage(notification.image),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -64,29 +61,16 @@ class NotificationScreen extends StatelessWidget {
                 style: const TextStyle(color: Colors.black, fontSize: 14),
                 children: [
                   TextSpan(
-                    text: "${noti['name']} ",
+                    text: "${notification.message} ",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  TextSpan(
-                    text: noti['action'],
-                    style: const TextStyle(fontWeight: FontWeight.w400),
-                  ),
-                  // Italicize 'photo' if it exists in action
-                  if (noti['action'].contains('photo'))
-                    const TextSpan(
-                      text: " photo",
-                      style: TextStyle(fontStyle: FontStyle.italic),
-                    ),
                 ],
               ),
             ),
           ),
           Text(
-            noti['time'],
-            style: TextStyle(
-              color: Colors.grey.shade500,
-              fontSize: 11,
-            ),
+            timeago.format(notification.createdAt),
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
           ),
         ],
       ),

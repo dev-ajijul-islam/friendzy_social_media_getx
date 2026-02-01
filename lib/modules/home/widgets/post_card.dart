@@ -287,7 +287,7 @@ Widget _cachedImage(
       color: Colors.grey[200],
       child: const Center(child: CircularProgressIndicator()),
     ),
-    errorWidget: (context, _, __) => Container(
+    errorWidget: (context, _, _) => Container(
       color: Colors.grey[300],
       child: const Icon(Icons.broken_image, size: 40),
     ),

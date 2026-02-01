@@ -8,6 +8,12 @@ class NotificationController extends GetxController {
   RxBool isLoading = false.obs;
   RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
+  @override
+  void onInit() {
+    getNotifications();
+    super.onInit();
+  }
+
   void getNotifications() async {
     FirebaseServices.firestore
         .collection("users")
