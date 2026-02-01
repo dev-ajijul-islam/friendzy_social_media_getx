@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:friendzy_social_media_getx/data/models/post_model.dart';
+import 'package:friendzy_social_media_getx/data/models/story_model.dart';
 import 'package:friendzy_social_media_getx/modules/chats/views/conversation_screen.dart';
 import 'package:friendzy_social_media_getx/modules/friends/controllers/friends_controllers.dart';
+import 'package:friendzy_social_media_getx/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
@@ -269,13 +272,39 @@ class UserProfileScreen extends StatelessWidget {
                               mainAxisSpacing: 8,
                               crossAxisSpacing: 8,
                             ),
-                        itemCount: user.postsCount,
+                        itemCount: controller.posts.length,
                         itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              'https://picsum.photos/200/200?random=$index',
-                              fit: BoxFit.cover,
+                          final PostModel post = controller.posts[index];
+                          return GestureDetector(
+                            onTap: () => Get.toNamed(
+                              AppRoutes.postDetailsScreen,
+                              arguments: post,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: post.images!.isEmpty
+                                  ? Card(
+                                      child: Center(
+                                        child: Text(
+                                          post.caption.length > 15
+                                              ? "${post.caption.substring(0, 15)}.."
+                                              : post.caption,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    )
+                                  : CachedNetworkImage(
+                                      imageUrl: post.images!.first.toString(),
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.image, size: 30),
+                                    ),
                             ),
                           );
                         },
@@ -288,13 +317,38 @@ class UserProfileScreen extends StatelessWidget {
                               mainAxisSpacing: 8,
                               crossAxisSpacing: 8,
                             ),
-                        itemCount: 6,
+                        itemCount: controller.stories.length,
                         itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              'https://picsum.photos/200/200?random=${index + 50}',
-                              fit: BoxFit.cover,
+                          final StoryModel story = controller.stories[index];
+                          return GestureDetector(
+                            onTap: () =>
+                                Get.toNamed(AppRoutes.storyDetailsScreen),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: story.story.images.isEmpty
+                                  ? Card(
+                                      child: Center(
+                                        child: Text(
+                                          story.story.captions.length > 15
+                                              ? "${story.story.captions.substring(0, 15)}.."
+                                              : story.story.captions,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    )
+                                  : CachedNetworkImage(
+                                      imageUrl: story.story.images.first
+                                          .toString(),
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.image, size: 30),
+                                    ),
                             ),
                           );
                         },
