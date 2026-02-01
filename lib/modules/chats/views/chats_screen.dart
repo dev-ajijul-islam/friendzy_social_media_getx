@@ -51,9 +51,7 @@ class ChatsScreen extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: colorScheme.primary.withOpacity(0.5),
-                  ),
+                  border: Border.all(color: colorScheme.primary.withAlpha(500)),
                 ),
                 child: TextField(
                   controller: chatsController.searchController,
