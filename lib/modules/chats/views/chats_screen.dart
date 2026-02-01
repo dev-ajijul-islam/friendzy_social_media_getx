@@ -38,8 +38,8 @@ class ChatsScreen extends StatelessWidget {
           centerTitle: true,
           bottom: const TabBar(
             tabs: [
-              Tab(text: "All Users"),
               Tab(text: "Conversations"),
+              Tab(text: "All Users"),
             ],
           ),
         ),
@@ -83,11 +83,40 @@ class ChatsScreen extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(
+              height: 60,
+              child: ListView.separated(
+                padding: .only(left: 10),
+                scrollDirection: .horizontal,
+                itemBuilder: (context, index) {
+                  final conversation = chatsController.conversations[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        () => ConversationScreen(
+                          conversationId: conversation.conversationId!,
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: CachedNetworkImageProvider(
+                        conversation.photo.isNotEmpty
+                            ? conversation.photo
+                            : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                      ),
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => SizedBox(width: 10),
+                itemCount: chatsController.conversations.length,
+              ),
+            ),
             Expanded(
               child: TabBarView(
                 children: [
-                  _AllUsersTab(colorScheme: colorScheme),
                   _ConversationsTab(colorScheme: colorScheme),
+                  _AllUsersTab(colorScheme: colorScheme),
                 ],
               ),
             ),
