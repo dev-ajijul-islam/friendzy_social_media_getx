@@ -24,23 +24,11 @@ class NotificationScreen extends StatelessWidget {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.black),
-            onPressed: () => controller.clearAll(),
-          ),
-        ],
       ),
       body: Obx(() => ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          const SizedBox(height: 10),
-          _buildSectionHeader("Today"),
-          ...controller.notificationsToday.map((noti) => _buildNotificationTile(noti, colorScheme)),
 
-          const SizedBox(height: 20),
-          _buildSectionHeader("12 January 2022"),
-          ...controller.notificationsPast.map((noti) => _buildNotificationTile(noti, colorScheme)),
         ],
       )),
     );

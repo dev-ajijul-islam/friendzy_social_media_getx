@@ -1,23 +1,41 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:friendzy_social_media_getx/data/models/notification_model.dart';
+import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
 import 'package:get/get.dart';
 
 class NotificationController extends GetxController {
-  // Mock data grouped by date
-  final notificationsToday = [
-    {'name': 'Patrick', 'action': 'Followed you', 'time': 'Just Now', 'image': 'https://i.pravatar.cc/150?u=1'},
-    {'name': 'Chris', 'action': 'Followed you', 'time': '2mins ago', 'image': 'https://i.pravatar.cc/150?u=2'},
-    {'name': 'Segun', 'action': 'Liked your photo', 'time': '15mins ago', 'image': 'https://i.pravatar.cc/150?u=3'},
-    {'name': 'Chris', 'action': 'commented on your post', 'time': '1hour ago', 'image': 'https://i.pravatar.cc/150?u=4'},
-  ].obs;
+  RxBool isLoading = false.obs;
+  RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
-  final notificationsPast = [
-    {'name': 'Patrick', 'action': 'Followed you', 'time': '11:20am', 'image': 'https://i.pravatar.cc/150?u=5'},
-    {'name': 'Chris', 'action': 'Followed you', 'time': '10:00am', 'image': 'https://i.pravatar.cc/150?u=6'},
-    {'name': 'Segun', 'action': 'Liked your photo', 'time': '09:00am', 'image': 'https://i.pravatar.cc/150?u=7'},
-    {'name': 'Chris', 'action': 'commented on your post', 'time': '07:00am', 'image': 'https://i.pravatar.cc/150?u=8'},
-  ].obs;
+  void getNotifications() async {
+    FirebaseServices.firestore
+        .collection("users")
+        .doc(FirebaseServices.auth.currentUser!.uid)
+        .collection("notifications")
+        .snapshots()
+        .listen(
+          (event) => notifications.value = event.docs
+              .map((e) => NotificationModel.fromJson(e.data()))
+              .toList(),
+        );
+  }
 
-  void clearAll() {
-    notificationsToday.clear();
-    notificationsPast.clear();
+  Future<void> createNotification({
+    required NotificationModel notification,
+    required String targetUserId,
+  }) async {
+    isLoading.value = true;
+    try {
+      await FirebaseServices.firestore
+          .collection("users")
+          .doc(targetUserId)
+          .collection("notifications")
+          .add(notification.toJson());
+    } on FirebaseException catch (e) {
+      debugPrint(e.message);
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
