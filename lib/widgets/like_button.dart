@@ -26,19 +26,11 @@ class LikeButton extends StatelessWidget {
         if (!isMe) {
           notificationController.createNotification(
             notification: NotificationModel(
-              image: FirebaseServices.auth.currentUser!.photoURL.toString(),
+              image:
+                  FirebaseServices.auth.currentUser!.photoURL ??
+                  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
               message:
                   "${FirebaseServices.auth.currentUser!.displayName} reacted to your post",
-              createdAt: DateTime.now(),
-            ),
-            targetUserId: post.author.uid!,
-          );
-        }else{
-          notificationController.createNotification(
-            notification: NotificationModel(
-              image: FirebaseServices.auth.currentUser!.photoURL.toString(),
-              message:
-              "${FirebaseServices.auth.currentUser!.displayName} reacted to your post",
               createdAt: DateTime.now(),
             ),
             targetUserId: post.author.uid!,

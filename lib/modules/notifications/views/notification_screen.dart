@@ -52,7 +52,11 @@ class NotificationScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 22,
-            backgroundImage: NetworkImage(notification.image),
+            backgroundImage: NetworkImage(
+              notification.image == "null"
+                  ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                  : notification.image,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

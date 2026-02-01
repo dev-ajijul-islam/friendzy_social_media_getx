@@ -19,6 +19,7 @@ class NotificationController extends GetxController {
         .collection("users")
         .doc(FirebaseServices.auth.currentUser!.uid)
         .collection("notifications")
+        .orderBy("createdAt",descending: true)
         .snapshots()
         .listen(
           (event) => notifications.value = event.docs
