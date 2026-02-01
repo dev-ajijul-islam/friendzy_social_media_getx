@@ -1,13 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:friendzy_social_media_getx/data/models/notification_model.dart';
 import 'package:friendzy_social_media_getx/data/models/user_model.dart';
 import 'package:friendzy_social_media_getx/data/services/firebase_services.dart';
+import 'package:friendzy_social_media_getx/modules/notifications/controllers/notification_controller.dart';
 import 'package:get/get.dart';
 
 class FriendsControllers extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isFollowingLoading = false.obs;
   RxString loadingUserId = ''.obs;
+
+  final NotificationController notificationController = Get.put(
+    NotificationController(),
+  );
 
   RxList<UserModel> allUsers = <UserModel>[].obs;
   final TextEditingController searchController = TextEditingController();
@@ -22,7 +28,6 @@ class FriendsControllers extends GetxController {
     super.onInit();
   }
 
-
   void getAllUsers() async {
     isLoading.value = true;
     FirebaseServices.firestore
@@ -30,11 +35,12 @@ class FriendsControllers extends GetxController {
         .where('uid', isNotEqualTo: auth.currentUser!.uid)
         .snapshots()
         .listen((snapshot) {
-      allUsers.value =
-          snapshot.docs.map((u) => UserModel.fromJson(u.data())).toList();
-      filteredUsers.value = allUsers;
-      isLoading.value = false;
-    });
+          allUsers.value = snapshot.docs
+              .map((u) => UserModel.fromJson(u.data()))
+              .toList();
+          filteredUsers.value = allUsers;
+          isLoading.value = false;
+        });
   }
 
   void _filterUsers() {
@@ -43,9 +49,11 @@ class FriendsControllers extends GetxController {
       filteredUsers.value = allUsers;
     } else {
       filteredUsers.value = allUsers
-          .where((user) =>
-      user.fullName.toLowerCase().contains(query) ||
-          user.email.toLowerCase().contains(query))
+          .where(
+            (user) =>
+                user.fullName.toLowerCase().contains(query) ||
+                user.email.toLowerCase().contains(query),
+          )
           .toList();
     }
   }
@@ -79,7 +87,6 @@ class FriendsControllers extends GetxController {
       final batch = FirebaseServices.firestore.batch();
 
       if (followingDoc.exists) {
-        // Unfollow
         batch.delete(
           FirebaseServices.firestore
               .collection("users")
@@ -107,6 +114,18 @@ class FriendsControllers extends GetxController {
         );
 
         await batch.commit();
+        notificationController.createNotification(
+          notification: NotificationModel(
+            image:
+                FirebaseServices.auth.currentUser!.photoURL ??
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+            message:
+                "${FirebaseServices.auth.currentUser!.displayName} is unfollowed you",
+            createdAt: DateTime.now(),
+          ),
+          targetUserId: targetUser.uid!,
+        );
+
         Get.snackbar("Success", "Unfollowed ${targetUser.fullName}");
       } else {
         // Follow
@@ -116,10 +135,7 @@ class FriendsControllers extends GetxController {
               .doc(currentUser.uid)
               .collection("following")
               .doc(targetUser.uid),
-          {
-            ...targetUser.toJson(),
-            'followedAt': FieldValue.serverTimestamp()
-          },
+          {...targetUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
         );
 
         batch.set(
@@ -128,10 +144,7 @@ class FriendsControllers extends GetxController {
               .doc(targetUser.uid)
               .collection("followers")
               .doc(currentUser.uid),
-          {
-            ...currentUser.toJson(),
-            'followedAt': FieldValue.serverTimestamp()
-          },
+          {...currentUser.toJson(), 'followedAt': FieldValue.serverTimestamp()},
         );
 
         batch.update(
@@ -146,6 +159,18 @@ class FriendsControllers extends GetxController {
 
         await batch.commit();
         Get.snackbar("Success", "Following ${targetUser.fullName}");
+
+        notificationController.createNotification(
+          notification: NotificationModel(
+            image:
+                FirebaseServices.auth.currentUser!.photoURL ??
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+            message:
+                "${FirebaseServices.auth.currentUser!.displayName} is followed you",
+            createdAt: DateTime.now(),
+          ),
+          targetUserId: targetUser.uid!,
+        );
       }
     } on FirebaseException catch (e) {
       Get.snackbar("Failed", e.message.toString());
