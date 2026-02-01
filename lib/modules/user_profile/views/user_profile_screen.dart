@@ -137,7 +137,9 @@ class UserProfileScreen extends StatelessWidget {
                                 size: 20,
                               ),
                               onPressed: () {
-                                Get.to(() => ConversationScreen(targetUser: user));
+                                Get.to(
+                                  () => ConversationScreen(targetUser: user),
+                                );
                               },
                             ),
                           ),
@@ -225,16 +227,9 @@ class UserProfileScreen extends StatelessWidget {
                   child: ListView.builder(
                     padding: const EdgeInsets.only(left: 20),
                     scrollDirection: Axis.horizontal,
-                    itemCount: 6,
+                    itemCount: controller.followers.length,
                     itemBuilder: (context, index) {
-                      final List<String> names = [
-                        "Elijah",
-                        "Abdul",
-                        "Qudus",
-                        "Joe",
-                        "Ojogbon",
-                        "Chris",
-                      ];
+                      final UserModel follower = controller.followers[index];
                       return Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: Column(
@@ -242,15 +237,8 @@ class UserProfileScreen extends StatelessWidget {
                             CircleAvatar(
                               radius: 30,
                               backgroundImage: NetworkImage(
-                                'https://i.pravatar.cc/150?u=user$index',
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              names[index % names.length],
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black87,
+                                follower.profilePic ??
+                                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                               ),
                             ),
                           ],
